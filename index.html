@@ -1164,15 +1164,15 @@
         <div class="form-subtitle">Matrículas 2027 · Aviso antecipado</div>
         <div class="form-group">
           <label>Nome completo</label>
-          <input type="text" placeholder="Seu nome" />
+          <input id="formMatNome" type="text" placeholder="Seu nome" />
         </div>
         <div class="form-group">
           <label>WhatsApp / Telefone</label>
-          <input type="tel" placeholder="(00) 00000-0000" />
+          <input id="formMatTel" type="tel" placeholder="(00) 00000-0000" />
         </div>
         <div class="form-group">
           <label>Série de interesse</label>
-          <select>
+          <select id="formMatSerie">
             <option value="">Selecione uma opção</option>
             <option>1º ano do Ensino Médio</option>
             <option>2º ano do Ensino Médio</option>
@@ -1181,7 +1181,7 @@
         </div>
         <div class="form-group">
           <label>Mensagem (opcional)</label>
-          <textarea placeholder="Alguma dúvida?"></textarea>
+          <textarea id="formMatMsg" placeholder="Alguma dúvida?"></textarea>
         </div>
         <button class="form-submit" onclick="handleForm('matricula')">Quero ser avisado!</button>
       </div>
@@ -1230,15 +1230,15 @@
         <div class="contato-form-title">Envie uma mensagem</div>
         <div class="form-group">
           <label>Seu nome</label>
-          <input type="text" placeholder="Como podemos te chamar?" />
+          <input id="formConNome" type="text" placeholder="Como podemos te chamar?" />
         </div>
         <div class="form-group">
           <label>E-mail ou WhatsApp</label>
-          <input type="text" placeholder="Para retornarmos o contato" />
+          <input id="formConContato" type="text" placeholder="Para retornarmos o contato" />
         </div>
         <div class="form-group">
           <label>Mensagem</label>
-          <textarea placeholder="Como podemos ajudar?" style="min-height:110px;"></textarea>
+          <textarea id="formConMsg" placeholder="Como podemos ajudar?" style="min-height:110px;"></textarea>
         </div>
         <button class="form-submit" onclick="handleForm('contato')">Enviar mensagem</button>
       </div>
@@ -1278,12 +1278,37 @@
       a.addEventListener('click', () => document.getElementById('navMenu').classList.remove('open'));
     });
 
-    // Form handler
+    // WhatsApp form handler
     function handleForm(type) {
-      const msg = type === 'matricula'
-        ? 'Interesse registrado! Entraremos em contato assim que as matrículas 2027 abrirem. 🎉'
-        : 'Mensagem enviada! Retornaremos em breve.';
-      alert(msg);
+      const phone = '5584999161013';
+
+      if (type === 'matricula') {
+        const nome  = document.querySelector('#formMatNome').value.trim();
+        const tel   = document.querySelector('#formMatTel').value.trim();
+        const serie = document.querySelector('#formMatSerie').value;
+        const msg   = document.querySelector('#formMatMsg').value.trim();
+
+        if (!nome || !serie) {
+          alert('Por favor, preencha pelo menos o nome e a série de interesse.');
+          return;
+        }
+
+        const texto = `Olá! Tenho interesse nas matrículas 2027 do Colégio Simples.\n\n👤 Nome: ${nome}\n📱 Telefone: ${tel || 'Não informado'}\n📚 Série: ${serie}${msg ? '\n💬 Mensagem: ' + msg : ''}`;
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(texto)}`, '_blank');
+
+      } else {
+        const nome  = document.querySelector('#formConNome').value.trim();
+        const contato = document.querySelector('#formConContato').value.trim();
+        const msg   = document.querySelector('#formConMsg').value.trim();
+
+        if (!nome || !msg) {
+          alert('Por favor, preencha pelo menos o nome e a mensagem.');
+          return;
+        }
+
+        const texto = `Olá! Entro em contato pelo site do Colégio Simples.\n\n👤 Nome: ${nome}\n📬 Contato: ${contato || 'Não informado'}\n💬 Mensagem: ${msg}`;
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(texto)}`, '_blank');
+      }
     }
   </script>
 </body>
