@@ -1232,9 +1232,10 @@
       #galeria { padding: 5rem 1.5rem; }
     }
 
-    @media (max-width: 600px) {
-      .gal-row { flex-wrap: wrap; }
-      .gal-cell { flex-basis: 48% !important; flex-grow: 1 !important; }
+    @media (max-width: 960px) {
+      #galeria { padding: 5rem 1.5rem; }
+      /* Mobile keeps same flex-grow logic as desktop, just smaller gap */
+      .gal-row { gap: 4px; margin-bottom: 4px; }
     }
     #galeria {
       padding: 6rem 5rem;
