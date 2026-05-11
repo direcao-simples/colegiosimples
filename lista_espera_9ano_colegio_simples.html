@@ -107,6 +107,7 @@
   }
 
   select option { background: #1a1a1a; }
+  select:disabled { opacity: 0.6; cursor: default; border-color: #222; }
   textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
   .divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
 
@@ -258,10 +259,8 @@
       </div>
       <div class="field">
         <label>Turno de preferência</label>
-        <select id="turno">
-          <option value="">Indiferente</option>
-          <option>Manhã</option>
-          <option>Tarde</option>
+        <select id="turno" disabled>
+          <option value="Manhã">Manhã</option>
         </select>
       </div>
     </div>
