@@ -988,10 +988,10 @@
       letter-spacing: 0.1em;
       text-transform: uppercase;
       text-decoration: none;
-      border: none;
+      border: 2px solid var(--orange);
       cursor: pointer;
       transition: background 0.2s, transform 0.2s;
-      margin-top: 0.5rem;
+      line-height: 1;
     }
     .btn-orange:hover { background: var(--orange-light); transform: translateY(-2px); }
 
@@ -1061,6 +1061,36 @@
       transition: background 0.2s, transform 0.2s;
     }
     .form-submit:hover { background: var(--orange-light); transform: translateY(-2px); }
+
+
+    .mat-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-top: 0.5rem;
+    }
+
+    .btn-orange-outline {
+      display: inline-block;
+      background: transparent;
+      color: var(--orange);
+      padding: calc(0.95rem - 2px) calc(2.4rem - 2px);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 2px solid var(--orange);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+      line-height: 1;
+    }
+    .btn-orange-outline:hover {
+      background: var(--orange);
+      color: var(--white);
+      transform: translateY(-2px);
+    }
 
     /* ── CONTATO ── */
     #contato {
@@ -1338,8 +1368,8 @@
       <p class="hero-folder-line">Menos distração. Mais transformação.<br>Aprender de forma simples. <em>Crescer de forma grandiosa.</em></p>
       <div class="hero-bottom">
         <div class="hero-actions">
-          <a href="#matriculas" class="btn-primary">Matrículas 2027</a>
-          <a href="#sobre" class="btn-ghost">Conheça a escola</a>
+          <a href="https://www.colegiosimples.com/lista_espera_1serie_em_colegio_simples" target="_blank" class="btn-primary">Reservar vaga · 1ª série EM</a>
+          <a href="https://www.colegiosimples.com/lista_espera_9ano_colegio_simples" target="_blank" class="btn-ghost">Reservar vaga · 9º ano</a>
         </div>
         <div class="hero-stats">
           <div>
@@ -1512,7 +1542,7 @@
       </div>
       <div class="ferramenta-card">
         <div class="ferramenta-icon">📊</div>
-        <div class="ferramenta-title">Simulado Somos ENEM</div>
+        <div class="ferramenta-title">Simulado Sommos ENEM</div>
         <p class="ferramenta-desc">Aplicação oficial no formato do ENEM, com correção TRI e relatórios detalhados. Mais de 190 mil questões e referência nacional em aprovação.</p>
       </div>
       <div class="ferramenta-card">
@@ -1706,7 +1736,11 @@
         <div class="mat-aviso">🔔 Cadastre seu interesse e seja avisado em primeira mão.</div>
         <p class="mat-desc">Com 95% das vagas já ocupadas neste ano, as turmas do Colégio Simples são disputadas. Deixe seu contato e avisaremos assim que as matrículas 2027 abrirem.</p>
         <p class="mat-desc">Venha aprender de forma simples. Crescer de forma grandiosa.</p>
-        <a href="https://wa.me/5584999161013" target="_blank" class="btn-orange">Falar pelo WhatsApp</a>
+        <div class="mat-buttons">
+          <a href="https://www.colegiosimples.com/lista_espera_1serie_em_colegio_simples" target="_blank" class="btn-orange">Reservar vaga · 1ª série EM</a>
+          <a href="https://www.colegiosimples.com/lista_espera_9ano_colegio_simples" target="_blank" class="btn-orange-outline">Reservar vaga · 9º ano</a>
+          <a href="https://wa.me/5584999161013" target="_blank" class="btn-orange-outline">Falar pelo WhatsApp</a>
+        </div>
       </div>
       <div class="matriculas-form reveal reveal-delay-2">
         <div class="form-title">Cadastre seu interesse</div>
