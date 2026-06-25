@@ -275,7 +275,7 @@
       <textarea id="obs" placeholder="Informe qualquer observação sobre o(a) aluno(a) ou dúvidas sobre o colégio..."></textarea>
     </div>
 
-    <label class="lgpd-box"
+    <label class="lgpd-box">
       <input type="checkbox" id="lgpd">
       <div class="lgpd-text">
         <strong>Consentimento de dados (LGPD)</strong><br>
@@ -295,4 +295,90 @@
 
   <div class="success-screen" id="successScreen">
     <div class="success-icon">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-wid
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <div class="success-title">Cadastro <span class="success-name" id="successName"></span> Confirmado!</div>
+    <p class="success-msg">Recebemos seu interesse com sucesso! Nossa equipe entrará em contato pelo WhatsApp assim que as matrículas para a 1ª Série do Ensino Médio forem abertas.</p>
+    <button class="novo-btn" onclick="novoForm()">Fazer outro cadastro</button>
+  </div>
+</div>
+
+<script>
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxV-vFvtwjZeCwQZe1jiFRB1R7SFBGOTiuuOSkw9Ny9sB4odmWykOCjfafG2u7ec-sT3Q/exec';
+
+  function submitForm() {
+    var nomeAluno  = document.getElementById('nomeAluno').value.trim();
+    var nascimento = document.getElementById('nascimento').value;
+    var nomeResp   = document.getElementById('nomeResp').value.trim();
+    var whatsapp   = document.getElementById('whatsapp').value.trim();
+    var email      = document.getElementById('email').value.trim();
+    var lgpd       = document.getElementById('lgpd').checked;
+
+    if (!nomeAluno || !nascimento || !nomeResp || !whatsapp || !email) {
+      alert('Por favor, preencha todos os campos obrigatórios (*).');
+      return;
+    }
+    if (!lgpd) {
+      alert('Por favor, aceite o consentimento de dados (LGPD) para continuar.');
+      return;
+    }
+
+    var btn     = document.getElementById('submitBtn');
+    var spinner = document.getElementById('spinner');
+    var btnText = document.getElementById('btnText');
+    var errMsg  = document.getElementById('errorMsg');
+
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    btnText.textContent = 'ENVIANDO...';
+    errMsg.style.display = 'none';
+
+    var payload = {
+      nomeAluno:   nomeAluno,
+      nascimento:  nascimento,
+      escolaAtual: document.getElementById('escolaAtual').value.trim(),
+      nomeResp:    nomeResp,
+      whatsapp:    whatsapp,
+      email:       email,
+      origem:      document.getElementById('origem').value,
+      turno:       'Manhã',
+      obs:         document.getElementById('obs').value.trim(),
+      serie:       '1ª Série EM'
+    };
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function() {
+      document.getElementById('successName').textContent = nomeAluno.split(' ')[0] + ',';
+      document.getElementById('formBody').style.display = 'none';
+      document.getElementById('successScreen').classList.add('show');
+    })
+    .catch(function() {
+      errMsg.style.display = 'block';
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      btnText.textContent = 'ENTRAR NA LISTA DE ESPERA';
+    });
+  }
+
+  function novoForm() {
+    document.getElementById('formBody').style.display = 'block';
+    document.getElementById('successScreen').classList.remove('show');
+    ['nomeAluno','nascimento','escolaAtual','nomeResp','whatsapp','email','origem','obs'].forEach(function(id) {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('lgpd').checked = false;
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('btnText').textContent = 'ENTRAR NA LISTA DE ESPERA';
+    document.getElementById('errorMsg').style.display = 'none';
+  }
+</script>
+</body>
+</html>
