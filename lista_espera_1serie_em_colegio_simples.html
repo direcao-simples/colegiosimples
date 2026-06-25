@@ -115,7 +115,9 @@
     background: #111; border: 1px solid #2a2a2a; border-radius: 8px;
     padding: 16px 20px; margin-bottom: 24px;
     display: flex; gap: 14px; align-items: flex-start;
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
   }
+  .lgpd-box .lgpd-text { -webkit-user-select: none; user-select: none; }
 
   .lgpd-box input[type="checkbox"] {
     width: 20px; height: 20px; margin-top: 2px;
@@ -273,13 +275,13 @@
       <textarea id="obs" placeholder="Informe qualquer observação sobre o(a) aluno(a) ou dúvidas sobre o colégio..."></textarea>
     </div>
 
-    <div class="lgpd-box">
+    <label class="lgpd-box" for="lgpd">
       <input type="checkbox" id="lgpd">
       <div class="lgpd-text">
         <strong>Consentimento de dados (LGPD)</strong><br>
         Ao se cadastrar, você concorda que o Colégio Simples utilize os dados fornecidos exclusivamente para contato referente ao processo de matrícula. Seus dados não serão compartilhados com terceiros.
       </div>
-    </div>
+    </label>
 
     <div class="error-msg" id="errorMsg">
       Ocorreu um erro ao enviar. Verifique sua conexão e tente novamente.
