@@ -339,7 +339,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 
 <script>
-  var SCRIPT_URL = 'COLE_AQUI_URL_APPS_SCRIPT_TRAFEGO';
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx-KYe_06RAhbz1gezQ_jgAeSSyqm_EsBCO2ZGGYXPFh4Pn0sgb8i5sZfAxV6szafIp/exec';
 
   var SERIES = {
     'Ensino Fundamental': ['9º ano'],
