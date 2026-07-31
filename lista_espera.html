@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5HHM6LW4');</script>
+<!-- End Google Tag Manager -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lista de Espera | Colégio Simples</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --orange: #FF5A00;
+    --black: #0A0A0A;
+    --white: #FFFFFF;
+    --gray: #1a1a1a;
+    --border: #2a2a2a;
+  }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 16px 60px;
+  }
+
+  .header { width: 100%; max-width: 680px; padding: 40px 0 0; text-align: center; }
+
+  .logo-area {
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px; margin-bottom: 32px;
+  }
+
+  .logo-icon {
+    width: 40px; height: 40px; background: var(--orange); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--white); letter-spacing: 1px;
+  }
+
+  .logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 3px; }
+
+  .badge {
+    display: inline-block; background: var(--orange); color: var(--white);
+    font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+    padding: 4px 14px; border-radius: 2px; margin-bottom: 20px;
+  }
+
+  .main-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(44px, 10vw, 72px);
+    line-height: 0.95; letter-spacing: 2px; margin-bottom: 16px;
+  }
+
+  .main-title span { color: var(--orange); }
+
+  .subtitle {
+    color: #888; font-size: 15px; font-weight: 300; line-height: 1.6;
+    max-width: 480px; margin: 0 auto 40px;
+  }
+
+  .form-card {
+    width: 100%; max-width: 680px; background: var(--gray);
+    border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  }
+
+  .form-card-header {
+    background: var(--orange); padding: 18px 32px;
+    display: flex; align-items: center; gap: 12px;
+    font-weight: 600; font-size: 15px;
+  }
+
+  .form-body { padding: 32px; }
+
+  .section-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--orange);
+    margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+  }
+
+  .field-row { display: grid; gap: 16px; margin-bottom: 16px; }
+  .field-row.cols-2 { grid-template-columns: 1fr 1fr; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+
+  label { font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #aaa; }
+
+  input, select, textarea {
+    background: #111; border: 1px solid #333; border-radius: 8px;
+    color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 15px;
+    padding: 12px 16px; transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%; outline: none; -webkit-appearance: none; appearance: none;
+  }
+
+  input::placeholder, textarea::placeholder { color: #555; }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--orange); box-shadow: 0 0 0 3px rgba(255,90,0,0.12);
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 16px center;
+    padding-right: 44px; cursor: pointer;
+  }
+
+  select option { background: #1a1a1a; }
+  select:disabled { opacity: 0.6; cursor: default; border-color: #222; }
+  textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+  .lgpd-box {
+    background: #111; border: 1px solid #2a2a2a; border-radius: 8px;
+    padding: 16px 20px; margin-bottom: 24px;
+    display: flex; gap: 14px; align-items: flex-start;
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .lgpd-box .lgpd-text { -webkit-user-select: none; user-select: none; }
+
+  .lgpd-box input[type="checkbox"] {
+    -webkit-appearance: auto; appearance: auto;
+    width: 20px; height: 20px; margin-top: 2px;
+    cursor: pointer; accent-color: var(--orange); flex-shrink: 0;
+  }
+
+  .lgpd-text { font-size: 13px; color: #888; line-height: 1.6; }
+  .lgpd-text strong { color: #ccc; }
+
+  .error-msg {
+    background: #2a0a0a; border: 1px solid #5a1a1a; color: #ff8888;
+    border-radius: 8px; padding: 12px 16px; font-size: 13px;
+    margin-bottom: 16px; display: none;
+  }
+
+  .submit-btn {
+    width: 100%; background: var(--orange); color: var(--white); border: none;
+    border-radius: 8px; font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px; letter-spacing: 3px; padding: 16px; cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+
+  .submit-btn:hover:not(:disabled) { background: #e04e00; }
+  .submit-btn:active:not(:disabled) { transform: scale(0.99); }
+  .submit-btn:disabled { background: #555; cursor: default; }
+
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
+    border-radius: 50%; animation: spin 0.7s linear infinite; display: none;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .success-screen {
+    display: none; text-align: center; padding: 60px 32px;
+    flex-direction: column; align-items: center; gap: 16px;
+  }
+
+  .success-screen.show { display: flex; }
+
+  .success-icon {
+    width: 72px; height: 72px; background: var(--orange); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 8px;
+  }
+
+  .success-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px; }
+  .success-name { color: var(--orange); }
+  .success-msg { color: #888; font-size: 14px; line-height: 1.7; max-width: 380px; }
+
+  .novo-btn {
+    background: transparent; border: 1px solid var(--orange); color: var(--orange);
+    border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+    padding: 12px 28px; cursor: pointer; margin-top: 8px; transition: all 0.2s;
+  }
+
+  .novo-btn:hover { background: var(--orange); color: white; }
+
+  @media (max-width: 600px) {
+    .form-body { padding: 24px 20px; }
+    .field-row.cols-2 { grid-template-columns: 1fr; }
+    .form-card-header { padding: 16px 20px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5HHM6LW4"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<div class="header">
+  <div class="logo-area">
+    <div class="logo-icon">CS</div>
+    <div class="logo-text">Colégio Simples</div>
+  </div>
+  <div class="badge">Matrículas 2027</div>
+  <h1 class="main-title">Lista de<br><span>Espera</span></h1>
+  <p class="subtitle">9º ano do Ensino Fundamental e 1ª, 2ª e 3ª séries do Ensino Médio — vagas limitadas. Cadastre seu interesse e nossa equipe entrará em contato quando as inscrições abrirem.</p>
+</div>
+
+<div class="form-card">
+  <div class="form-card-header">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+    Formulário de Interesse — Ano letivo 2027
+  </div>
+
+  <div class="form-body" id="formBody">
+
+    <div class="section-label">Série de Interesse</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Série *</label>
+        <select id="serie">
+          <option value="">Selecione a série...</option>
+          <option value="9ano">9º ano — Ensino Fundamental</option>
+          <option value="1serie">1ª série — Ensino Médio</option>
+          <option value="2serie">2ª série — Ensino Médio</option>
+          <option value="3serie">3ª série — Ensino Médio</option>
+        </select>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section-label">Dados do(a) Aluno(a)</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Nome completo do(a) aluno(a) *</label>
+        <input type="text" id="nomeAluno" placeholder="Nome completo">
+      </div>
+    </div>
+    <div class="field-row cols-2">
+      <div class="field">
+        <label>Data de nascimento *</label>
+        <input type="date" id="nascimento">
+      </div>
+      <div class="field">
+        <label>Escola atual</label>
+        <input type="text" id="escolaAtual" placeholder="Nome da escola">
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section-label">Dados do Responsável</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Nome do responsável *</label>
+        <input type="text" id="nomeResp" placeholder="Nome completo">
+      </div>
+    </div>
+    <div class="field-row cols-2">
+      <div class="field">
+        <label>WhatsApp *</label>
+        <input type="tel" id="whatsapp" placeholder="(84) 9 9999-9999">
+      </div>
+      <div class="field">
+        <label>E-mail *</label>
+        <input type="email" id="email" placeholder="email@exemplo.com">
+      </div>
+    </div>
+    <div class="field-row cols-2">
+      <div class="field">
+        <label>Como nos conheceu?</label>
+        <select id="origem">
+          <option value="">Selecione...</option>
+          <option>Indicação de amigos/família</option>
+          <option>Instagram / Redes sociais</option>
+          <option>Google / Internet</option>
+          <option>Outdoor / Panfleto</option>
+          <option>Já sou da comunidade Simples</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Turno</label>
+        <select id="turno" disabled>
+          <option value="Manhã">Manhã</option>
+        </select>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section-label">Informações Adicionais</div>
+    <div class="field" style="margin-bottom:24px;">
+      <label>Observações ou dúvidas (opcional)</label>
+      <textarea id="obs" placeholder="Informe qualquer observação sobre o(a) aluno(a) ou dúvidas sobre o colégio..."></textarea>
+    </div>
+
+    <label class="lgpd-box">
+      <input type="checkbox" id="lgpd">
+      <div class="lgpd-text">
+        <strong>Consentimento de dados (LGPD)</strong><br>
+        Ao se cadastrar, você concorda que o Colégio Simples utilize os dados fornecidos exclusivamente para contato referente ao processo de matrícula. Seus dados não serão compartilhados com terceiros.
+      </div>
+    </label>
+
+    <div class="error-msg" id="errorMsg">
+      Ocorreu um erro ao enviar. Verifique sua conexão e tente novamente.
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="submitForm()">
+      <div class="spinner" id="spinner"></div>
+      <span id="btnText">ENTRAR NA LISTA DE ESPERA</span>
+    </button>
+  </div>
+
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <div class="success-title">Cadastro <span class="success-name" id="successName"></span> Confirmado!</div>
+    <p class="success-msg" id="successMsg">Recebemos seu interesse com sucesso! Nossa equipe entrará em contato pelo WhatsApp assim que as matrículas forem abertas.</p>
+    <button class="novo-btn" onclick="novoForm()">Fazer outro cadastro</button>
+  </div>
+</div>
+
+<script>
+  // Cada série envia para o Apps Script da SUA planilha (mesmas planilhas das páginas antigas)
+  var SERIES = {
+    '9ano':   { nome: '9º ano — Ensino Fundamental', url: 'https://script.google.com/macros/s/AKfycbwBvoZ7mgiuRxvtCYlcI3pSI6hCqKIHgKcnl-QQs-71Rxm9qBlfYPfMCmkm5OVbvzkh/exec' },
+    '1serie': { nome: '1ª série — Ensino Médio',     url: 'https://script.google.com/macros/s/AKfycbxV-vFvtwjZeCwQZe1jiFRB1R7SFBGOTiuuOSkw9Ny9sB4odmWykOCjfafG2u7ec-sT3Q/exec' },
+    '2serie': { nome: '2ª série — Ensino Médio',     url: 'https://script.google.com/macros/s/AKfycbw8EiIWJuD3Xqhuz8N0_1UfRqS7ZgABgfio4gquSzskrxWOOxtJURnP8l9x1Md2LD2l/exec' },
+    '3serie': { nome: '3ª série — Ensino Médio',     url: 'https://script.google.com/macros/s/AKfycbzD8Truf4l6q_QK_Qid-93eOHV9tIrEUoy8r6X9ZDzUc2Eo0FwjR9LfkwKqMCkuyBpj/exec' }
+  };
+
+  // Pré-seleção via URL: /lista_espera?serie=9ano | 1serie | 2serie | 3serie
+  (function() {
+    var pre = new URLSearchParams(window.location.search).get('serie');
+    if (pre && SERIES[pre]) {
+      document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('serie').value = pre;
+      });
+    }
+  })();
+
+  function submitForm() {
+    var serieKey   = document.getElementById('serie').value;
+    var nomeAluno  = document.getElementById('nomeAluno').value.trim();
+    var nascimento = document.getElementById('nascimento').value;
+    var nomeResp   = document.getElementById('nomeResp').value.trim();
+    var whatsapp   = document.getElementById('whatsapp').value.trim();
+    var email      = document.getElementById('email').value.trim();
+    var lgpd       = document.getElementById('lgpd').checked;
+
+    if (!serieKey) {
+      alert('Por favor, escolha a série de interesse.');
+      return;
+    }
+    if (!nomeAluno || !nascimento || !nomeResp || !whatsapp || !email) {
+      alert('Por favor, preencha todos os campos obrigatórios (*).');
+      return;
+    }
+    if (!lgpd) {
+      alert('Por favor, aceite o consentimento de dados (LGPD) para continuar.');
+      return;
+    }
+
+    var serie = SERIES[serieKey];
+
+    var btn     = document.getElementById('submitBtn');
+    var spinner = document.getElementById('spinner');
+    var btnText = document.getElementById('btnText');
+    var errMsg  = document.getElementById('errorMsg');
+
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    btnText.textContent = 'ENVIANDO...';
+    errMsg.style.display = 'none';
+
+    var payload = {
+      nomeAluno:   nomeAluno,
+      nascimento:  nascimento,
+      escolaAtual: document.getElementById('escolaAtual').value.trim(),
+      nomeResp:    nomeResp,
+      whatsapp:    whatsapp,
+      email:       email,
+      origem:      document.getElementById('origem').value,
+      turno:       'Manhã',
+      obs:         document.getElementById('obs').value.trim(),
+      serie:       serie.nome
+    };
+
+    fetch(serie.url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function() {
+      // Evento próprio do site (orgânico) — diferente do 'lead_lista_espera' da página de tráfego
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'lead_lista_espera_site',
+        serie: serie.nome
+      });
+
+      document.getElementById('successName').textContent = nomeAluno.split(' ')[0] + ',';
+      document.getElementById('successMsg').textContent =
+        'Recebemos seu interesse com sucesso! Nossa equipe entrará em contato pelo WhatsApp assim que as matrículas para ' + serie.nome.split(' — ')[0] + ' forem abertas.';
+      document.getElementById('formBody').style.display = 'none';
+      document.getElementById('successScreen').classList.add('show');
+    })
+    .catch(function() {
+      errMsg.style.display = 'block';
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      btnText.textContent = 'ENTRAR NA LISTA DE ESPERA';
+    });
+  }
+
+  function novoForm() {
+    document.getElementById('formBody').style.display = 'block';
+    document.getElementById('successScreen').classList.remove('show');
+    ['serie','nomeAluno','nascimento','escolaAtual','nomeResp','whatsapp','email','origem','obs'].forEach(function(id) {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('lgpd').checked = false;
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('btnText').textContent = 'ENTRAR NA LISTA DE ESPERA';
+    document.getElementById('errorMsg').style.display = 'none';
+  }
+</script>
+</body>
+</html>
