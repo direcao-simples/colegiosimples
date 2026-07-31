@@ -413,11 +413,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         serie: serie.nome
       });
 
-      document.getElementById('successName').textContent = nomeAluno.split(' ')[0] + ',';
-      document.getElementById('successMsg').textContent =
-        'Recebemos seu interesse com sucesso! Nossa equipe entrará em contato pelo WhatsApp assim que as matrículas para ' + serie.nome.split(' — ')[0] + ' forem abertas.';
-      document.getElementById('formBody').style.display = 'none';
-      document.getElementById('successScreen').classList.add('show');
+      // Pequena espera para o GTM registrar o evento antes de sair da página
+      setTimeout(function() {
+        window.location.href = 'https://www.colegiosimples.com/obrigado';
+      }, 400);
     })
     .catch(function() {
       errMsg.style.display = 'block';
