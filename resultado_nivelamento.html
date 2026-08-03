@@ -156,6 +156,27 @@
     font-size: 13.5px; font-weight: 500; color: #eee;
   }
 
+  /* fluxo via plataforma parceira */
+  .fluxo-card { display: flex; flex-direction: column; gap: 22px; justify-content: center; }
+  .fluxo-card .btn { width: 100%; margin-top: 0; }
+  .fluxo-texto { color: #bbb; font-size: 15px; font-weight: 300; line-height: 1.7; }
+  .card-hint { color: #666; font-size: 13px; text-align: center; }
+  .parceria-box {
+    background: var(--orange-soft); border: 1px solid rgba(255,90,0,0.35);
+    border-radius: 12px; padding: 20px 22px;
+  }
+  .parceria-titulo { font-weight: 700; font-size: 15px; margin-bottom: 8px; color: var(--white); }
+  .parceria-box p { color: #ccc; font-size: 14px; font-weight: 300; line-height: 1.7; }
+  .passos { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+  .passos li { display: flex; gap: 14px; align-items: flex-start; }
+  .passos li span {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--orange); color: #fff;
+    font-family: 'Bebas Neue', sans-serif; font-size: 16px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;
+  }
+  .passos li strong { font-size: 15px; color: var(--white); }
+  .passos li div { color: var(--muted); font-size: 13.5px; font-weight: 300; line-height: 1.55; }
+
   .lgpd-box {
     background: #111; border: 1px solid #2a2a2a; border-radius: 10px;
     padding: 16px 20px; margin: 6px 0 18px;
@@ -348,62 +369,21 @@
   <div class="wrap">
     <div class="sec-num">01</div>
     <div class="sec-kicker">SEU PRIMEIRO PASSO</div>
-    <p class="sec-lead">Preencha com calma. São poucos campos. Depois da inscrição, a nossa equipe te chama no WhatsApp pra confirmar a data, o horário e te passar as orientações. Você não vai ficar sem resposta.</p>
+    <p class="sec-lead">A inscrição é rápida e feita pelo próprio aluno. Ela acontece no app do Colégio New Way, nosso parceiro: é lá que você cria o acesso, faz a prova e, depois, acompanha o seu resultado. A gente te explica o porquê logo abaixo.</p>
 
     <div class="inscricao-grid">
-      <div class="form-card" id="formInscricao">
-        <div class="field">
-          <label for="insNome">Nome completo do aluno</label>
-          <input type="text" id="insNome" autocomplete="name" placeholder="Como está no seu documento">
+      <div class="form-card fluxo-card">
+        <div class="parceria-box">
+          <div class="parceria-titulo">Pais e alunos: por que o cadastro é no app do New Way?</div>
+          <p>Pode confiar, é isso mesmo. O Colégio New Way é escola parceira do Simples, e o nivelamento roda na plataforma deles, que já está pronta e funcionando. Todo o resto continua com a gente: o acompanhamento, a devolutiva da prova e a matrícula são aqui no Colégio Simples, em Mossoró.</p>
         </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="insCpf">CPF do aluno</label>
-            <input type="text" id="insCpf" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" maxlength="14">
-          </div>
-          <div class="field">
-            <label for="insNasc">Data de nascimento</label>
-            <input type="date" id="insNasc">
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="insSerie">Série que vai cursar</label>
-            <select id="insSerie">
-              <option value="">Escolha a série</option>
-              <option>9º Ano</option>
-              <option>1ª Série EM</option>
-              <option>2ª Série EM</option>
-              <option>3ª Série EM</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="insEscola">Escola atual</label>
-            <input type="text" id="insEscola" placeholder="Onde você estuda hoje">
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="insResp">Nome do responsável</label>
-            <input type="text" id="insResp" placeholder="Pai, mãe ou responsável">
-          </div>
-          <div class="field">
-            <label for="insZap">WhatsApp para contato</label>
-            <input type="tel" id="insZap" autocomplete="tel" placeholder="(84) 9 9999-9999">
-          </div>
-        </div>
-
-        <label class="lgpd-box">
-          <input type="checkbox" id="insLgpd">
-          <div class="lgpd-text">
-            <strong>Consentimento de dados (LGPD)</strong><br>
-            Ao se inscrever, você concorda que o Colégio Simples use esses dados só para o contato sobre a prova e o processo de matrícula. Nada é compartilhado com terceiros.
-          </div>
-        </label>
-
-        <button class="btn" onclick="enviarInscricao()">Confirmar minha inscrição</button>
-        <div class="msg-loading" id="insLoading">Enviando a sua inscrição...</div>
-        <div class="msg-erro" id="insErro"></div>
+        <ol class="passos">
+          <li><span>1</span><div><strong>Crie seu acesso</strong><br>Um cadastro rápido, feito pelo próprio aluno, no app do parceiro.</div></li>
+          <li><span>2</span><div><strong>Conheça o ambiente</strong><br>Você entra e explora a plataforma antes de qualquer prova.</div></li>
+          <li><span>3</span><div><strong>Faça o nivelamento</strong><br>Escolha a data, faça a prova e acompanhe tudo por lá.</div></li>
+        </ol>
+        <a class="btn" href="https://app.colegionewway.com.br/inscricao" target="_blank" rel="noopener">Fazer meu cadastro</a>
+        <span class="card-hint">Leva poucos minutos. Qualquer dúvida, chama a gente no WhatsApp.</span>
       </div>
 
       <div class="inscricao-foto">
@@ -412,15 +392,6 @@
       </div>
     </div>
 
-    <div class="success-card" id="insSucesso">
-      <div class="success-icon">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <div class="success-title">Prontinho, <span id="insSucessoNome"></span>!</div>
-      <p class="success-msg">A sua inscrição chegou aqui. Agora é com a gente: vamos te chamar no WhatsApp pra combinar a data da prova e te contar como tudo funciona. Enquanto isso, respira. Vai dar tudo certo.</p>
-      <button class="btn btn-outline" onclick="novaInscricao()">Fazer outra inscrição</button>
-      <div class="demo-flag" id="insDemoFlag" style="margin-top:14px">Modo demonstração · nada foi enviado</div>
-    </div>
   </div>
 </section>
 
@@ -428,43 +399,13 @@
   <div class="wrap">
     <div class="sec-num">02</div>
     <div class="sec-kicker">SEU RESULTADO</div>
-    <p class="sec-lead">Já fez a prova? Então essa parte é sua. Digite o CPF e a data de nascimento que você usou na inscrição. E antes de olhar o número, lembra: essa nota é um ponto de partida, não um rótulo.</p>
+    <p class="sec-lead">Já fez a prova? Então essa parte é sua. O resultado sai na mesma plataforma onde você fez o cadastro e a prova. E antes de olhar o número, lembra: essa nota é um ponto de partida, não um rótulo.</p>
 
-    <div class="form-card" style="max-width:560px">
-      <div class="field">
-        <label for="cpf">CPF do aluno</label>
-        <input type="text" id="cpf" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" maxlength="14">
-      </div>
-      <div class="field">
-        <label for="nasc">Data de nascimento</label>
-        <input type="date" id="nasc">
-      </div>
-      <button class="btn" onclick="consultar()">Ver meu resultado</button>
-      <div class="msg-loading" id="msgLoading">Buscando o seu resultado...</div>
-      <div class="msg-erro" id="msgErro"></div>
-    </div>
-
-    <div id="resultado">
-      <div class="res-card">
-        <div class="res-head">
-          <div class="res-nome" id="resNome"></div>
-          <div class="res-serie" id="resSerie"></div>
-        </div>
-        <div class="res-body">
-          <p class="res-oi" id="resOi"></p>
-          <div class="res-geral" id="resGeralWrap">
-            <div class="num" id="resGeral"></div>
-            <div class="lab">Nota geral<br>do nivelamento</div>
-          </div>
-          <div id="resNotas"></div>
-          <div class="res-situacao" id="resSituacaoWrap">
-            <div class="sit-label">Situação</div>
-            <div class="sit-valor" id="resSituacao"></div>
-          </div>
-          <div class="res-obs" id="resObs"></div>
-        </div>
-      </div>
-      <div class="demo-flag" id="demoFlag">Modo demonstração · dados fictícios</div>
+    <div class="form-card fluxo-card" style="max-width:560px">
+      <p class="fluxo-texto">É só entrar com o acesso que você criou na inscrição. Saiu a correção, a sua nota fica lá te esperando, com o detalhe por área. Depois, a nossa equipe conversa com você sobre ela, com calma e sem pressa.</p>
+      <!-- Se a parceria tiver um link direto de resultados, troque a URL abaixo -->
+      <a class="btn" href="https://app.colegionewway.com.br" target="_blank" rel="noopener">Ver meu resultado</a>
+      <span class="card-hint">Não achou ou ficou com dúvida? Chama a gente no WhatsApp que a gente verifica junto.</span>
     </div>
   </div>
 </section>
@@ -537,8 +478,12 @@
     <div class="sec-num">06</div>
     <div class="sec-kicker">PERGUNTAS DE QUEM CHEGOU ATÉ AQUI</div>
     <details>
-      <summary>Me inscrevi. E agora?</summary>
-      <div class="faq-body">Agora é com a gente. A equipe do Colégio te chama no WhatsApp pra confirmar a data e o horário da prova e te passar as orientações. Se bater ansiedade, pode chamar a gente antes.</div>
+      <summary>Por que o cadastro e o resultado são no app do Colégio New Way?</summary>
+      <div class="faq-body">Porque o New Way é escola parceira do Simples, e a plataforma deles já está pronta e funcionando pra isso. É um ambiente seguro, o mesmo que os alunos deles usam todos os dias. O que não muda: a prova, a devolutiva e a matrícula continuam sendo com o Colégio Simples, aqui em Mossoró.</div>
+    </details>
+    <details>
+      <summary>Me cadastrei. E agora?</summary>
+      <div class="faq-body">Agora você explora o ambiente do estudante com calma e agenda o nivelamento quando se sentir pronto. A nossa equipe acompanha tudo de perto e fica à disposição no WhatsApp pra qualquer dúvida.</div>
     </details>
     <details>
       <summary>Preciso estudar para a prova?</summary>
@@ -550,7 +495,7 @@
     </details>
     <details>
       <summary>Não encontrei o meu resultado. E agora?</summary>
-      <div class="faq-body">Primeiro, confere se o CPF e a data de nascimento são os mesmos da inscrição. Se estiver tudo certo e mesmo assim não aparecer, é provável que a sua prova ainda esteja em correção. Chama a gente no WhatsApp que a gente verifica pra você.</div>
+      <div class="faq-body">O resultado aparece na plataforma depois da correção, no mesmo acesso que você criou no cadastro. Se já passou um tempo e nada apareceu, chama a gente no WhatsApp que a gente verifica pra você.</div>
     </details>
     <details>
       <summary>Quero conversar sobre o meu resultado. Com quem falo?</summary>
@@ -566,220 +511,7 @@
   </div>
 </footer>
 
-<script>
-  /* =====================================================================
-     CONFIGURAÇÃO
-     1. Publique o Apps Script (arquivo apps_script_resultado_nivelamento.gs)
-        como App da Web: Executar como "Eu", acesso "Qualquer pessoa".
-        O MESMO script atende os dois fluxos: inscrição (POST) e resultado (GET).
-     2. Cole a URL /exec abaixo. Enquanto SCRIPT_URL estiver vazia, a página
-        roda em MODO DEMONSTRAÇÃO: a inscrição não envia nada e a consulta
-        usa os dados fictícios de DEMO_DATA.
-     ===================================================================== */
-  var SCRIPT_URL = '';
 
-  var DEMO_DATA = [
-    { cpf: '11111111111', nasc: '2010-03-15', nome: 'Aluno de Teste', serie: '1ª Série EM',
-      geral: 720, notas: { 'Matemática': 680, 'Linguagens': 750, 'Ciências Humanas': 710, 'Ciências da Natureza': 740 },
-      situacao: 'Apto para matrícula', obs: 'Você mostrou um ótimo domínio de interpretação de texto. Em matemática, vale reforçar funções antes do início das aulas. Vamos te chamar pra conversar sobre isso com calma.' }
-  ];
-
-  /* máscara simples de CPF (usada nos dois campos) */
-  function mascaraCpf(el) {
-    el.addEventListener('input', function () {
-      var v = this.value.replace(/\D/g, '').slice(0, 11);
-      if (v.length > 9)      v = v.replace(/(\d{3})(\d{3})(\d{3})(\d+)/, '$1.$2.$3-$4');
-      else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d+)/, '$1.$2.$3');
-      else if (v.length > 3) v = v.replace(/(\d{3})(\d+)/, '$1.$2');
-      this.value = v;
-    });
-  }
-  mascaraCpf(document.getElementById('cpf'));
-  mascaraCpf(document.getElementById('insCpf'));
-
-  /* ============================ INSCRIÇÃO ============================ */
-  function enviarInscricao() {
-    var nome   = document.getElementById('insNome').value.trim();
-    var cpf    = document.getElementById('insCpf').value.replace(/\D/g, '');
-    var nasc   = document.getElementById('insNasc').value;
-    var serie  = document.getElementById('insSerie').value;
-    var escola = document.getElementById('insEscola').value.trim();
-    var resp   = document.getElementById('insResp').value.trim();
-    var zap    = document.getElementById('insZap').value.trim();
-    var lgpd   = document.getElementById('insLgpd').checked;
-    var erro   = document.getElementById('insErro');
-    var load   = document.getElementById('insLoading');
-
-    erro.style.display = 'none';
-
-    if (!nome || cpf.length !== 11 || !nasc || !serie || !resp || !zap) {
-      erro.textContent = 'Faltou pouca coisa: confere se o nome, o CPF completo, a data de nascimento, a série, o responsável e o WhatsApp estão preenchidos.';
-      erro.style.display = 'block';
-      return;
-    }
-    if (!lgpd) {
-      erro.textContent = 'Só falta marcar o consentimento de dados (LGPD) pra gente poder te chamar.';
-      erro.style.display = 'block';
-      return;
-    }
-
-    var payload = {
-      tipo: 'inscricao',
-      nomeAluno: nome, cpf: cpf, nascimento: nasc, serie: serie,
-      escolaAtual: escola, nomeResp: resp, whatsapp: zap
-    };
-
-    if (!SCRIPT_URL) {
-      mostrarSucessoInscricao(nome, true);
-      return;
-    }
-
-    load.style.display = 'block';
-    fetch(SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    }).then(function () {
-      load.style.display = 'none';
-      mostrarSucessoInscricao(nome, false);
-    }).catch(function () {
-      load.style.display = 'none';
-      erro.textContent = 'Algo travou no envio. Tenta de novo em instantes. Se não for, chama a gente no WhatsApp que a gente te inscreve por lá mesmo.';
-      erro.style.display = 'block';
-    });
-  }
-
-  function mostrarSucessoInscricao(nome, demo) {
-    document.getElementById('insSucessoNome').textContent = nome.split(' ')[0];
-    document.getElementById('insDemoFlag').style.display = demo ? 'block' : 'none';
-    document.getElementById('formInscricao').parentElement.style.display = 'none';
-    var ok = document.getElementById('insSucesso');
-    ok.style.display = 'block';
-    ok.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-
-  function novaInscricao() {
-    ['insNome','insCpf','insNasc','insSerie','insEscola','insResp','insZap'].forEach(function (id) {
-      document.getElementById(id).value = '';
-    });
-    document.getElementById('insLgpd').checked = false;
-    document.getElementById('insSucesso').style.display = 'none';
-    document.getElementById('formInscricao').parentElement.style.display = 'grid';
-  }
-
-  /* ============================ RESULTADO ============================ */
-  function consultar() {
-    var cpf  = document.getElementById('cpf').value.replace(/\D/g, '');
-    var nasc = document.getElementById('nasc').value;
-    var erro = document.getElementById('msgErro');
-    var load = document.getElementById('msgLoading');
-
-    erro.style.display = 'none';
-    document.getElementById('resultado').style.display = 'none';
-
-    if (cpf.length !== 11 || !nasc) {
-      erro.textContent = 'Preencha o CPF completo e a data de nascimento, os mesmos que você usou na inscrição.';
-      erro.style.display = 'block';
-      return;
-    }
-
-    if (!SCRIPT_URL) {
-      var reg = DEMO_DATA.find(function (r) { return r.cpf === cpf && r.nasc === nasc; });
-      if (reg) { mostrarResultado(reg, true); }
-      else { mostrarErroNaoEncontrado(); }
-      return;
-    }
-
-    load.style.display = 'block';
-    fetch(SCRIPT_URL + '?cpf=' + encodeURIComponent(cpf) + '&nasc=' + encodeURIComponent(nasc))
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        load.style.display = 'none';
-        if (data && data.found) { mostrarResultado(data, false); }
-        else { mostrarErroNaoEncontrado(); }
-      })
-      .catch(function () {
-        load.style.display = 'none';
-        erro.textContent = 'Não conseguimos buscar agora. Tenta de novo daqui a pouco. Se continuar assim, chama a gente no WhatsApp que a gente resolve junto.';
-        erro.style.display = 'block';
-      });
-  }
-
-  function mostrarErroNaoEncontrado() {
-    var erro = document.getElementById('msgErro');
-    erro.textContent = 'Não achamos o seu resultado por aqui. Confere se o CPF e a data são os mesmos da inscrição? Se estiver tudo certo, a sua prova pode ainda estar em correção. Chama a gente no WhatsApp que a gente verifica pra você.';
-    erro.style.display = 'block';
-  }
-
-  function mostrarResultado(d, demo) {
-    var primeiroNome = String(d.nome || '').split(' ')[0];
-    document.getElementById('resNome').textContent  = d.nome || '';
-    document.getElementById('resSerie').textContent = d.serie || '';
-    document.getElementById('resOi').innerHTML = '';
-    var oi = document.getElementById('resOi');
-    oi.appendChild(document.createElement('strong')).textContent = primeiroNome + ', esse é o seu ponto de partida.';
-    oi.appendChild(document.createTextNode(' Olha os números com calma e sem peso. Eles mostram de onde você começa, não até onde você vai.'));
-
-    var geralWrap = document.getElementById('resGeralWrap');
-    if (d.geral !== '' && d.geral !== null && d.geral !== undefined) {
-      document.getElementById('resGeral').textContent = d.geral;
-      geralWrap.style.display = 'flex';
-    } else {
-      geralWrap.style.display = 'none';
-    }
-
-    var notasDiv = document.getElementById('resNotas');
-    notasDiv.innerHTML = '';
-    var notas = d.notas || {};
-    var max = 1000; /* escala das notas; ajuste se a prova usar 0 a 100 */
-    Object.keys(notas).forEach(function (area) {
-      var val = notas[area];
-      if (val === '' || val === null || val === undefined) return;
-      var pct = Math.max(0, Math.min(100, (Number(val) / max) * 100));
-      var row = document.createElement('div');
-      row.className = 'nota-row';
-      row.innerHTML =
-        '<div class="nota-top"><div class="nota-nome"></div><div class="nota-val"></div></div>' +
-        '<div class="nota-bar"><div class="nota-fill"></div></div>';
-      row.querySelector('.nota-nome').textContent = area;
-      row.querySelector('.nota-val').textContent = val;
-      notasDiv.appendChild(row);
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () { row.querySelector('.nota-fill').style.width = pct + '%'; });
-      });
-    });
-
-    var sitWrap = document.getElementById('resSituacaoWrap');
-    if (d.situacao) {
-      document.getElementById('resSituacao').textContent = d.situacao;
-      sitWrap.style.display = 'block';
-    } else {
-      sitWrap.style.display = 'none';
-    }
-
-    var obs = document.getElementById('resObs');
-    if (d.obs) {
-      obs.innerHTML = '<strong>Recado da nossa equipe pra você:</strong> ';
-      obs.appendChild(document.createTextNode(d.obs));
-      obs.style.display = 'block';
-    } else {
-      obs.style.display = 'none';
-    }
-
-    document.getElementById('demoFlag').style.display = demo ? 'block' : 'none';
-    var res = document.getElementById('resultado');
-    res.style.display = 'block';
-    res.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  /* Enter dispara a busca na consulta */
-  ['cpf', 'nasc'].forEach(function (id) {
-    document.getElementById(id).addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') consultar();
-    });
-  });
-</script>
 
 </body>
 </html>
