@@ -71,6 +71,13 @@
     color: var(--muted); font-size: 17px; font-weight: 300;
     max-width: 520px; margin-bottom: 36px;
   }
+  .data-chip {
+    display: inline-flex; align-items: baseline; gap: 10px;
+    border: 1px solid rgba(255,90,0,0.5); background: var(--orange-soft);
+    border-radius: 999px; padding: 10px 22px; margin-bottom: 32px;
+  }
+  .data-chip .dc-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--orange); }
+  .data-chip .dc-valor { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1.5px; color: var(--white); }
   .btn {
     display: inline-block; background: var(--orange); color: var(--white);
     font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700;
@@ -351,6 +358,7 @@
         <div class="badge">Prova de Nivelamento</div>
         <h1>Que bom<br>ter <span>você</span> aqui.</h1>
         <p>A Prova de Nivelamento é o nosso primeiro encontro. Ela não reprova ninguém e não é um teste pra te julgar. É o jeito que a gente tem de conhecer você e planejar o seu caminho no Simples desde o primeiro dia.</p>
+        <div class="data-chip"><span class="dc-label">Prova presencial</span><span class="dc-valor">21 de agosto · 13h · no Colégio Simples</span></div>
         <div class="btn-row">
           <a href="#inscrever" class="btn">Quero fazer a prova</a>
           <a href="#consultar" class="btn btn-outline">Já fiz. Ver meu resultado</a>
@@ -369,18 +377,18 @@
   <div class="wrap">
     <div class="sec-num">01</div>
     <div class="sec-kicker">SEU PRIMEIRO PASSO</div>
-    <p class="sec-lead">A inscrição é rápida e feita pelo próprio aluno. Ela acontece no app do Colégio New Way, nosso parceiro: é lá que você cria o acesso, faz a prova e, depois, acompanha o seu resultado. A gente te explica o porquê logo abaixo.</p>
+    <p class="sec-lead">A inscrição é rápida e feita pelo próprio aluno, no app do Colégio New Way, nosso parceiro. A prova é presencial, aqui no Colégio Simples, e o resultado você acompanha depois pelo mesmo app. A gente te explica tudo logo abaixo.</p>
 
     <div class="inscricao-grid">
       <div class="form-card fluxo-card">
         <div class="parceria-box">
           <div class="parceria-titulo">Pais e alunos: por que o cadastro é no app do New Way?</div>
-          <p>Pode confiar, é isso mesmo. O Colégio New Way é escola parceira do Simples, e o nivelamento roda na plataforma deles, que já está pronta e funcionando. Todo o resto continua com a gente: o acompanhamento, a devolutiva da prova e a matrícula são aqui no Colégio Simples, em Mossoró.</p>
+          <p>Pode confiar, é isso mesmo. O Colégio New Way é escola parceira do Simples, e a plataforma deles, que já está pronta e funcionando, cuida do cadastro e do resultado. A prova em si é presencial, aqui no Colégio Simples, em Mossoró. E o resto também é com a gente: o acompanhamento, a devolutiva e a matrícula.</p>
         </div>
         <ol class="passos">
           <li><span>1</span><div><strong>Crie seu acesso</strong><br>Um cadastro rápido, feito pelo próprio aluno, no app do parceiro.</div></li>
           <li><span>2</span><div><strong>Conheça o ambiente</strong><br>Você entra e explora a plataforma antes de qualquer prova.</div></li>
-          <li><span>3</span><div><strong>Faça o nivelamento</strong><br>Escolha a data, faça a prova e acompanhe tudo por lá.</div></li>
+          <li><span>3</span><div><strong>Faça a prova presencial</strong><br>Dia 21 de agosto, às 13h, aqui no Colégio Simples.</div></li>
         </ol>
         <a class="btn" href="https://app.colegionewway.com.br/inscricao" target="_blank" rel="noopener">Fazer meu cadastro</a>
         <span class="card-hint">Leva poucos minutos. Qualquer dúvida, chama a gente no WhatsApp.</span>
@@ -399,12 +407,11 @@
   <div class="wrap">
     <div class="sec-num">02</div>
     <div class="sec-kicker">SEU RESULTADO</div>
-    <p class="sec-lead">Já fez a prova? Então essa parte é sua. O resultado sai na mesma plataforma onde você fez o cadastro e a prova. E antes de olhar o número, lembra: essa nota é um ponto de partida, não um rótulo.</p>
+    <p class="sec-lead">Já fez a prova? Então essa parte é sua. O resultado sai no app onde você fez o seu cadastro. E antes de olhar o número, lembra: essa nota é um ponto de partida, não um rótulo.</p>
 
     <div class="form-card fluxo-card" style="max-width:560px">
       <p class="fluxo-texto">É só entrar com o acesso que você criou na inscrição. Saiu a correção, a sua nota fica lá te esperando, com o detalhe por área. Depois, a nossa equipe conversa com você sobre ela, com calma e sem pressa.</p>
-      <!-- Se a parceria tiver um link direto de resultados, troque a URL abaixo -->
-      <a class="btn" href="https://app.colegionewway.com.br" target="_blank" rel="noopener">Ver meu resultado</a>
+      <a class="btn" href="https://app.colegionewway.com.br/login" target="_blank" rel="noopener">Ver meu resultado</a>
       <span class="card-hint">Não achou ou ficou com dúvida? Chama a gente no WhatsApp que a gente verifica junto.</span>
     </div>
   </div>
@@ -479,11 +486,11 @@
     <div class="sec-kicker">PERGUNTAS DE QUEM CHEGOU ATÉ AQUI</div>
     <details>
       <summary>Por que o cadastro e o resultado são no app do Colégio New Way?</summary>
-      <div class="faq-body">Porque o New Way é escola parceira do Simples, e a plataforma deles já está pronta e funcionando pra isso. É um ambiente seguro, o mesmo que os alunos deles usam todos os dias. O que não muda: a prova, a devolutiva e a matrícula continuam sendo com o Colégio Simples, aqui em Mossoró.</div>
+      <div class="faq-body">Porque o New Way é escola parceira do Simples, e a plataforma deles já está pronta e funcionando pra cuidar do cadastro e do resultado. É um ambiente seguro, o mesmo que os alunos deles usam todos os dias. O que não muda: a prova é presencial aqui no Colégio Simples, em Mossoró, e a devolutiva e a matrícula também são com a gente.</div>
     </details>
     <details>
       <summary>Me cadastrei. E agora?</summary>
-      <div class="faq-body">Agora você explora o ambiente do estudante com calma e agenda o nivelamento quando se sentir pronto. A nossa equipe acompanha tudo de perto e fica à disposição no WhatsApp pra qualquer dúvida.</div>
+      <div class="faq-body">Agora você explora o ambiente do estudante com calma e marca na agenda: a prova é presencial, aqui no Colégio Simples, no dia 21 de agosto, às 13h. Chegue com um tempinho de folga. Se bater ansiedade antes, pode chamar a gente no WhatsApp.</div>
     </details>
     <details>
       <summary>Preciso estudar para a prova?</summary>
