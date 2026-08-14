@@ -230,11 +230,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <label>Série *</label>
         <select id="serie">
           <option value="">Selecione a série...</option>
-          <option value="9ano">9º ano — Ensino Fundamental</option>
-          <option value="1serie">1ª série — Ensino Médio</option>
+          <option value="9ano" disabled>9º ano — Ensino Fundamental (vagas esgotadas)</option>
+          <option value="1serie" disabled>1ª série — Ensino Médio (vagas esgotadas)</option>
           <option value="2serie">2ª série — Ensino Médio</option>
           <option value="3serie">3ª série — Ensino Médio</option>
         </select>
+        <div id="avisoEsgotado" style="display:none; margin-top:10px; background:rgba(255,90,0,0.08); border:1px solid rgba(255,90,0,0.5); border-radius:8px; padding:14px 16px; font-size:14px; color:#ccc; line-height:1.6;">
+          As vagas de <strong style="color:#fff;">9º ano</strong> e <strong style="color:#fff;">1ª série do Ensino Médio</strong> para 2027 estão esgotadas. Mas você pode entrar na fila de espera: se surgir vaga, chamamos as famílias na ordem de inscrição.<br>
+          <a id="avisoEsgotadoLink" href="https://www.colegiosimples.com/fila_espera" style="display:inline-block; margin-top:10px; color:#FF5A00; font-weight:600; text-decoration:none; border:1px solid #FF5A00; border-radius:8px; padding:8px 18px;">Entrar na fila de espera →</a>
+        </div>
       </div>
     </div>
 
@@ -345,12 +349,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     '3serie': { nome: '3ª série — Ensino Médio',     url: 'https://script.google.com/macros/s/AKfycbzD8Truf4l6q_QK_Qid-93eOHV9tIrEUoy8r6X9ZDzUc2Eo0FwjR9LfkwKqMCkuyBpj/exec' }
   };
 
+  // Séries com vagas esgotadas: bloqueadas na reserva; oferecem a fila de espera
+  var ESGOTADAS = ['9ano', '1serie'];
+
   // Pré-seleção via URL: /lista_espera?serie=9ano | 1serie | 2serie | 3serie
   (function() {
     var pre = new URLSearchParams(window.location.search).get('serie');
     if (pre && SERIES[pre]) {
       document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('serie').value = pre;
+        if (ESGOTADAS.indexOf(pre) !== -1) {
+          // Não pré-seleciona: mostra o aviso e leva pra fila com a série já marcada
+          document.getElementById('avisoEsgotado').style.display = 'block';
+          document.getElementById('avisoEsgotadoLink').href =
+            'https://www.colegiosimples.com/fila_espera?serie=' + pre;
+        } else {
+          document.getElementById('serie').value = pre;
+        }
       });
     }
   })();
@@ -366,6 +380,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     if (!serieKey) {
       alert('Por favor, escolha a série de interesse.');
+      return;
+    }
+    if (ESGOTADAS.indexOf(serieKey) !== -1) {
+      document.getElementById('avisoEsgotado').style.display = 'block';
       return;
     }
     if (!nomeAluno || !nascimento || !nomeResp || !whatsapp || !email) {
