@@ -282,6 +282,21 @@
     }
     .btn-dark:hover { background: var(--orange); transform: translateY(-2px); }
 
+    .btn-esgotado {
+      display: inline-block;
+      background: var(--gray-mid);
+      color: var(--gray-subtle);
+      padding: 0.95rem 2.4rem;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: none;
+      cursor: not-allowed;
+      user-select: none;
+    }
+
     .hero-stats { display: flex; gap: 3.5rem; }
     .stat-num {
       font-family: 'Barlow Condensed', sans-serif;
@@ -1412,12 +1427,13 @@
         <div>
           <div class="hero-actions-label">Reserve sua vaga · Matrículas 2027</div>
           <div class="hero-actions">
-            <a href="https://www.colegiosimples.com/lista_espera?serie=9ano" target="_blank" class="btn-primary">9º ano</a>
-            <a href="https://www.colegiosimples.com/lista_espera?serie=1serie" target="_blank" class="btn-primary">1ª série EM</a>
+            <span class="btn-esgotado" title="Vagas esgotadas — entre na fila de espera">9º ano · Esgotado</span>
+            <span class="btn-esgotado" title="Vagas esgotadas — entre na fila de espera">1ª série EM · Esgotado</span>
             <a href="https://www.colegiosimples.com/lista_espera?serie=2serie" target="_blank" class="btn-primary">2ª série EM</a>
             <a href="https://www.colegiosimples.com/lista_espera?serie=3serie" target="_blank" class="btn-primary">3ª série EM</a>
           </div>
           <div class="hero-actions" style="margin-top: 0.8rem;">
+            <a href="https://www.colegiosimples.com/fila_espera" target="_blank" class="btn-primary">Fila de espera · 9º ano e 1ª série</a>
             <a href="https://www.colegiosimples.com/prova_nivelamento" target="_blank" class="btn-dark">Inscrição · Prova de Nivelamento</a>
           </div>
         </div>
@@ -1788,8 +1804,9 @@
         <p class="mat-desc">Venha aprender de forma simples. Crescer de forma grandiosa.</p>
         <div class="mat-buttons">
           <a href="https://www.colegiosimples.com/prova_nivelamento" target="_blank" class="btn-dark">Inscrição · Prova de Nivelamento</a>
-          <a href="https://www.colegiosimples.com/lista_espera?serie=9ano" target="_blank" class="btn-orange">Reservar vaga · 9º ano</a>
-          <a href="https://www.colegiosimples.com/lista_espera?serie=1serie" target="_blank" class="btn-orange">Reservar vaga · 1ª série EM</a>
+          <span class="btn-esgotado" title="Vagas esgotadas — entre na fila de espera">9º ano · Vagas esgotadas</span>
+          <span class="btn-esgotado" title="Vagas esgotadas — entre na fila de espera">1ª série EM · Vagas esgotadas</span>
+          <a href="https://www.colegiosimples.com/fila_espera" target="_blank" class="btn-orange">Fila de espera · 9º ano e 1ª série</a>
           <a href="https://www.colegiosimples.com/lista_espera?serie=2serie" target="_blank" class="btn-orange">Reservar vaga · 2ª série EM</a>
           <a href="https://www.colegiosimples.com/lista_espera?serie=3serie" target="_blank" class="btn-orange">Reservar vaga · 3ª série EM</a>
           <a href="https://wa.me/5584999161013" target="_blank" class="btn-orange-outline">Falar pelo WhatsApp</a>
