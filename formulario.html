@@ -344,6 +344,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <script>
   var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx-KYe_06RAhbz1gezQ_jgAeSSyqm_EsBCO2ZGGYXPFh4Pn0sgb8i5sZfAxV6szafIp/exec';
 
+  // GA4: form_start — dispara UMA vez, no primeiro toque em qualquer campo do formulário
+  (function() {
+    var disparado = false;
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('formBody').addEventListener('focusin', function() {
+        if (disparado) return;
+        disparado = true;
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: 'form_start', form: 'formulario_trafego' });
+      });
+    });
+  })();
+
   var SERIES = {
     'Ensino Fundamental': ['9º ano'],
     'Ensino Médio': ['1ª série EM', '2ª série EM', '3ª série EM']
@@ -464,6 +477,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       document.getElementById('successScreen').classList.add('show');
     })
     .catch(function() {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'form_error', form: 'formulario_trafego' });
       errMsg.style.display = 'block';
       btn.disabled = false;
       spinner.style.display = 'none';

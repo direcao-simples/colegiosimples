@@ -349,6 +349,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     '3serie': { nome: '3ª série — Ensino Médio',     url: 'https://script.google.com/macros/s/AKfycbzD8Truf4l6q_QK_Qid-93eOHV9tIrEUoy8r6X9ZDzUc2Eo0FwjR9LfkwKqMCkuyBpj/exec' }
   };
 
+  // GA4: form_start — dispara UMA vez, no primeiro toque em qualquer campo do formulário
+  (function() {
+    var disparado = false;
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('formBody').addEventListener('focusin', function() {
+        if (disparado) return;
+        disparado = true;
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: 'form_start', form: 'lista_espera' });
+      });
+    });
+  })();
+
   // Séries com vagas esgotadas: bloqueadas na reserva; oferecem a fila de espera
   var ESGOTADAS = ['9ano', '1serie'];
 
@@ -440,6 +453,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       }, 400);
     })
     .catch(function() {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'form_error', form: 'lista_espera' });
       errMsg.style.display = 'block';
       btn.disabled = false;
       spinner.style.display = 'none';
