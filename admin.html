@@ -189,6 +189,27 @@
         </div>
         <div class="acoes-linha" id="provaAcoes"></div>
       </div>
+
+      <!-- importação de notas (leitora de cartão) -->
+      <div class="cartao oculto" id="cartaoImportar" style="border-color:rgba(255,90,0,0.5);">
+        <div class="rotulo">Importar notas da leitura dos cartões</div>
+        <p style="color:var(--cinza); font-size:13.5px; margin:-4px 0 14px; line-height:1.7;">
+          Cole abaixo (ou envie o arquivo) o resultado do processamento dos cartões — um aluno por linha, começando pelo <strong style="color:var(--branco);">RA</strong> que ele escreveu no cartão. Dois formatos aceitos:<br>
+          <strong style="color:var(--branco);">RA;NOTA</strong> &nbsp;(ex.: <code>500123;31</code>) — a nota já vem pronta da leitora<br>
+          <strong style="color:var(--branco);">RA;RESPOSTAS</strong> &nbsp;(ex.: <code>500123;ABCDEABC…</code>) — a plataforma corrige comparando com o gabarito oficial abaixo
+        </p>
+        <div class="campo"><label>Gabarito oficial (apenas para o formato de respostas — 1 letra por questão)</label>
+          <input type="text" id="impGabarito" placeholder="ex.: ABCDEABCDE… (45 letras)" style="text-transform:uppercase; letter-spacing:2px;"></div>
+        <div class="campo"><label>Resultado da leitura</label>
+          <textarea id="impTexto" rows="6" style="width:100%; background:#111; border:1px solid #333; border-radius:8px; color:var(--branco); font-family:ui-monospace,Consolas,monospace; font-size:13px; padding:12px 14px; outline:none;" placeholder="500123;31&#10;500124;28&#10;…"></textarea></div>
+        <div class="acoes-linha">
+          <label class="btn fantasma" style="cursor:pointer;">📄 Enviar arquivo (.csv/.txt)<input type="file" id="impArquivo" accept=".csv,.txt,.tsv" style="display:none;" onchange="lerArquivoImportacao(this)"></label>
+          <button class="btn" onclick="analisarImportacao()">Conferir antes de aplicar</button>
+          <button class="btn fantasma" onclick="toggleImportar()">Fechar</button>
+        </div>
+        <div id="impPreview" style="margin-top:16px;"></div>
+      </div>
+
       <div class="cartao" style="padding:6px 4px;"><div class="rolagem-x"><table id="tabInsc">
         <thead><tr><th>Candidato</th><th>RA</th><th>Contato</th><th>Aprovação</th><th>Nota</th><th>Situação</th><th>Observações</th><th></th></tr></thead>
         <tbody></tbody></table></div></div>
@@ -468,11 +489,18 @@
     document.getElementById('chipLeitura').innerHTML = ehMaster() ? '' : '<span class="badge laranja">Somente leitura · Secretaria</span>';
     var acoes = document.getElementById('provaAcoes');
     acoes.innerHTML = ehMaster()
-      ? '<button class="btn fantasma" onclick="definirNotaMinima()">Nota mínima</button>' +
+      ? '<button class="btn fantasma" onclick="listaRAs()">🖨 Lista de RAs</button>' +
+        '<button class="btn fantasma" onclick="toggleImportar()">⬆ Importar notas</button>' +
+        '<button class="btn fantasma" onclick="definirNotaMinima()">Nota mínima</button>' +
         '<button class="btn fantasma" onclick="aprovarTodos()">✓ Confirmar todas as inscrições</button>' +
         '<button class="btn fantasma" onclick="csvInscritos()">⬇ CSV</button>' +
         '<button class="btn" onclick="divulgarResultados()">Divulgar resultados</button>'
-      : '<button class="btn fantasma" onclick="csvInscritos()">⬇ CSV</button>';
+      : '<button class="btn fantasma" onclick="listaRAs()">🖨 Lista de RAs</button>' +
+        '<button class="btn fantasma" onclick="csvInscritos()">⬇ CSV</button>';
+    document.getElementById('cartaoImportar').classList.add('oculto');
+    document.getElementById('impPreview').innerHTML = '';
+    document.getElementById('impTexto').value = '';
+    importPlano = null;
     document.querySelector('#tabInsc tbody').innerHTML = '<tr><td colspan="8" class="carregando">Carregando…</td></tr>';
     var r = await sb.from('inscricoes')
       .select('*, candidatos(nome, ra, escola_atual, whatsapp, email, resp_nome)')
@@ -583,6 +611,134 @@
         return [c.nome || '', c.ra || '', c.escola_atual || '', c.resp_nome || '', c.whatsapp || '', c.email || '',
           m.aprovacao, m.nota === null ? '' : m.nota, situacaoDe(m)[0], m.observacoes || '', new Date(m.criado_em).toLocaleString('pt-BR')];
       })));
+  }
+
+  // ───── IMPORTAÇÃO DE NOTAS (leitura de cartões) ─────
+  var importPlano = null;
+
+  function toggleImportar() {
+    document.getElementById('cartaoImportar').classList.toggle('oculto');
+    document.getElementById('impPreview').innerHTML = '';
+    importPlano = null;
+  }
+
+  function lerArquivoImportacao(input) {
+    var f = input.files && input.files[0];
+    if (!f) return;
+    var leitor = new FileReader();
+    leitor.onload = function() { document.getElementById('impTexto').value = String(leitor.result || '').trim(); };
+    leitor.readAsText(f);
+    input.value = '';
+  }
+
+  function analisarImportacao() {
+    var texto = document.getElementById('impTexto').value.trim();
+    var gab = document.getElementById('impGabarito').value.trim().toUpperCase().replace(/[^A-E]/g, '');
+    var alvo = document.getElementById('impPreview');
+    importPlano = null;
+    if (!texto) { alvo.innerHTML = '<div class="erro-caixa">Cole o resultado da leitura ou envie o arquivo.</div>'; return; }
+
+    var porRA = {};
+    inscritos.forEach(function(m, i) { if (m.candidatos && m.candidatos.ra) porRA[m.candidatos.ra] = i; });
+
+    var plano = [], problemas = [], vistos = {}, ignoradas = 0;
+    texto.split(/\r?\n/).forEach(function(l, n) {
+      var limpa = l.trim();
+      if (!limpa) return;
+      var partes = limpa.split(/[;,\t]+/).map(function(p) { return p.trim(); });
+      var ra = (partes[0] || '').replace(/\D/g, '');
+      if (!ra) { ignoradas++; return; } // cabeçalho ou linha sem RA
+      var resto = partes.slice(1).join('');
+      var nota, detalhe;
+      if (/^\d{1,3}$/.test(resto)) {
+        nota = parseInt(resto, 10);
+        if (nota > provaAtual.total_questoes) { problemas.push('Linha ' + (n + 1) + ' (RA ' + ra + '): nota ' + nota + ' maior que o total de questões (' + provaAtual.total_questoes + ') — ignorada.'); return; }
+        detalhe = 'nota do arquivo';
+      } else {
+        var resp = resto.toUpperCase().replace(/[^A-EX*.\-]/g, '');
+        if (!resp) { ignoradas++; return; }
+        if (!gab) { problemas.push('Linha ' + (n + 1) + ' (RA ' + ra + '): veio como respostas, mas o gabarito oficial não foi preenchido — ignorada.'); return; }
+        var acertos = 0;
+        for (var q = 0; q < Math.min(resp.length, gab.length); q++) if (resp[q] === gab[q]) acertos++;
+        nota = acertos;
+        detalhe = 'corrigida pela plataforma (' + resp.length + ' respostas' + (resp.length !== gab.length ? ', gabarito tem ' + gab.length : '') + ')';
+      }
+      if (!(ra in porRA)) { problemas.push('RA ' + ra + ' (linha ' + (n + 1) + ') não está inscrito nesta prova — confira o número.'); return; }
+      if (ra in vistos) { problemas.push('RA ' + ra + ' aparece mais de uma vez no arquivo — usei a última linha.'); plano.splice(vistos[ra], 1); }
+      var m = inscritos[porRA[ra]];
+      vistos[ra] = plano.length;
+      plano.push({ idx: porRA[ra], ra: ra, nome: (m.candidatos || {}).nome || '?', nota: nota, detalhe: detalhe,
+                   sobrescreve: m.nota !== null && m.nota !== undefined && m.nota !== nota, notaAntiga: m.nota });
+    });
+
+    var idsComNota = {};
+    plano.forEach(function(p) { idsComNota[p.idx] = true; });
+    var semNota = inscritos.filter(function(m, i) { return !idsComNota[i]; }).map(function(m) { return (m.candidatos || {}).nome; });
+
+    var html = '';
+    if (problemas.length) html += '<div class="erro-caixa"><strong>Atenção:</strong><br>' + problemas.map(esc).join('<br>') + '</div>';
+    if (!plano.length) { alvo.innerHTML = html + '<div class="erro-caixa">Nenhuma nota válida encontrada no texto.</div>'; return; }
+    html += '<div class="rolagem-x"><table><thead><tr><th>Aluno</th><th>RA</th><th>Nota</th><th>Origem</th><th></th></tr></thead><tbody>' +
+      plano.map(function(p) {
+        return '<tr><td>' + esc(p.nome) + '</td><td class="tabular">' + p.ra + '</td>' +
+          '<td class="tabular" style="font-weight:700;">' + p.nota + '<span style="color:var(--cinza2);"> /' + provaAtual.total_questoes + '</span></td>' +
+          '<td style="color:var(--cinza); font-size:12.5px;">' + esc(p.detalhe) + '</td>' +
+          '<td>' + (p.sobrescreve ? '<span class="badge alerta">substitui nota ' + p.notaAntiga + '</span>' : '') + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+    html += '<div class="aviso-caixa" style="margin-top:12px;"><strong>' + plano.length + ' nota' + (plano.length === 1 ? '' : 's') + '</strong> pronta' + (plano.length === 1 ? '' : 's') + ' pra aplicar' +
+      (semNota.length ? ' · <strong>' + semNota.length + ' inscrito(s) sem nota no arquivo</strong> (' + semNota.slice(0, 4).map(esc).join(', ') + (semNota.length > 4 ? '…' : '') + ')' : ' · todos os inscritos cobertos ✓') +
+      '. Nada foi divulgado às famílias ainda.</div>';
+    html += '<button class="btn" id="btnAplicarImport" style="margin-top:12px;" onclick="aplicarImportacao()">Aplicar ' + plano.length + ' nota' + (plano.length === 1 ? '' : 's') + '</button>';
+    alvo.innerHTML = html;
+    importPlano = plano;
+  }
+
+  async function aplicarImportacao() {
+    if (!importPlano || !importPlano.length) return;
+    var btn = document.getElementById('btnAplicarImport');
+    btn.disabled = true; btn.textContent = 'Aplicando…';
+    var falhas = 0;
+    for (var k = 0; k < importPlano.length; k++) {
+      var p = importPlano[k];
+      var r = await sb.from('inscricoes').update({ nota: p.nota }).eq('id', inscritos[p.idx].id);
+      if (r.error) falhas++; else inscritos[p.idx].nota = p.nota;
+    }
+    desenharInscritos();
+    document.getElementById('impPreview').innerHTML = falhas
+      ? '<div class="erro-caixa">' + (importPlano.length - falhas) + ' notas aplicadas; ' + falhas + ' falharam — clique em "Conferir antes de aplicar" e tente novamente.</div>'
+      : '<div class="aviso-caixa"><strong>' + importPlano.length + ' notas aplicadas com sucesso.</strong> Confira a tabela abaixo e, quando estiver tudo certo, clique em <strong>Divulgar resultados</strong> pra liberar às famílias.</div>';
+    if (!falhas) importPlano = null;
+  }
+
+  // ───── LISTA DE RAs PARA O DIA DA PROVA ─────
+  function htmlListaRAs() {
+    var ordenados = inscritos.slice().sort(function(a, b) {
+      return ((a.candidatos || {}).nome || '').localeCompare((b.candidatos || {}).nome || '', 'pt-BR');
+    });
+    var linhas = ordenados.map(function(m, i) {
+      var c = m.candidatos || {};
+      return '<tr><td>' + (i + 1) + '</td><td>' + esc(c.nome || '') + '</td><td class="ra">' + (c.ra || '') + '</td><td>' + esc(c.escola_atual || '') + '</td><td></td></tr>';
+    }).join('');
+    return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Lista de RAs — ' + esc(provaAtual.titulo) + '</title><style>' +
+      'body{font-family:Arial,Helvetica,sans-serif;color:#111;margin:24px;}h1{font-size:19px;margin:0 0 3px;}p{margin:0 0 14px;color:#444;font-size:12.5px;line-height:1.5;}' +
+      'table{width:100%;border-collapse:collapse;font-size:13px;}th,td{border:1px solid #999;padding:7px 9px;text-align:left;}' +
+      'th{background:#eee;font-size:10.5px;text-transform:uppercase;letter-spacing:1px;}td.ra{font-size:17px;font-weight:bold;letter-spacing:1px;}' +
+      'td:last-child{min-width:150px;}@media print{body{margin:8mm;}}</style></head><body>' +
+      '<h1>' + esc(provaAtual.titulo) + ' — Lista de Registros (RA)</h1>' +
+      '<p>' + fmtData(provaAtual.data_hora) + ' · Colégio Simples · ' + ordenados.length + ' inscritos<br>' +
+      '<strong>Cada aluno deve escrever o próprio número de registro (RA) no cartão-resposta.</strong></p>' +
+      '<table><thead><tr><th>#</th><th>Aluno</th><th>RA</th><th>Escola</th><th>Assinatura</th></tr></thead><tbody>' + linhas + '</tbody></table>' +
+      '</body></html>';
+  }
+
+  function listaRAs() {
+    if (!inscritos.length) { alert('Nenhum inscrito nesta prova ainda.'); return; }
+    var w = window.open('', '_blank');
+    if (!w) { alert('O navegador bloqueou a janela de impressão — permita pop-ups para este site.'); return; }
+    w.document.write(htmlListaRAs());
+    w.document.close();
+    w.focus();
+    setTimeout(function() { w.print(); }, 400);
   }
 
   // ───── utilidades ─────
