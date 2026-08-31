@@ -196,6 +196,31 @@
         <strong>Regra do processo:</strong> abaixo da nota mínima ninguém recebe um "não" — a situação vira <em>"Conversar com a família"</em> e a equipe agenda o contato. Use a coluna de observações pra registrar o combinado de cada conversa. O candidato só vê a própria nota depois de <strong>Divulgar resultados</strong>.
       </div>
     </div>
+
+    <!-- EQUIPE (só master) -->
+    <div id="pgEquipe" class="oculto">
+      <div class="topo" style="margin-bottom:0;">
+        <div><h1 class="titulo">Equipe</h1><p class="sub">Quem tem acesso à gestão do processo seletivo</p></div>
+        <button class="btn fantasma" onclick="carregarEquipe()">↻ Atualizar</button>
+      </div>
+
+      <div class="cartao">
+        <div class="rotulo">Solicitações de acesso</div>
+        <p style="color:var(--cinza); font-size:13.5px; margin:-6px 0 14px;">Contas criadas no /admin que ainda não têm papel. Aprove como <strong style="color:var(--branco);">Master</strong> (acesso total) ou <strong style="color:var(--branco);">Secretaria</strong> (só leitura de resultados).</p>
+        <div id="listaPendentes"><div class="carregando">Carregando…</div></div>
+      </div>
+
+      <div class="cartao">
+        <div class="rotulo">Equipe com acesso</div>
+        <div class="rolagem-x"><table id="tabEquipe">
+          <thead><tr><th>Nome</th><th>E-mail</th><th>Papel</th><th>Desde</th><th></th></tr></thead>
+          <tbody></tbody></table></div>
+      </div>
+
+      <div class="aviso-caixa">
+        <strong>Papéis:</strong> <strong style="color:var(--branco);">Master</strong> (Hugo, Elton) gerencia tudo — candidatos, provas, notas, resultados e a própria equipe. <strong style="color:var(--branco);">Secretaria</strong> só visualiza resultados e observações, sem editar nada. Sua própria conta não pode ser alterada aqui (proteção contra ficar sem master).
+      </div>
+    </div>
   </div>
 </div>
 
@@ -207,6 +232,7 @@
 
   var SERIES = { '9ano': '9º ano — Fundamental', '1serie': '1ª série — Médio', '2serie': '2ª série — Médio', '3serie': '3ª série — Médio' };
   var eu = null;           // { nome, papel }
+  var euId = null;         // meu próprio user_id (proteção da conta na aba Equipe)
   var candidatos = [];
   var provas = [];
   var provaAtual = null;
@@ -257,6 +283,7 @@
     var q = await sb.from('equipe').select('*').eq('user_id', sess.user.id).maybeSingle();
     if (!q.data) { mostrar('telaSemAcesso'); document.getElementById('quemNome').textContent = sess.user.email; document.getElementById('quemPapel').textContent = 'sem papel'; return; }
     eu = q.data;
+    euId = sess.user.id;
     document.getElementById('quemNome').textContent = eu.nome;
     document.getElementById('quemPapel').textContent = eu.papel === 'master' ? 'Direção · master' : 'Secretaria · leitura';
     montarNav();
@@ -265,21 +292,86 @@
   }
 
   function montarNav() {
-    var itens = ehMaster() ? [['candidatos', 'Candidatos'], ['provas', 'Provas']] : [['provas', 'Provas e resultados']];
+    var itens = ehMaster()
+      ? [['candidatos', 'Candidatos'], ['provas', 'Provas'], ['equipe', 'Equipe']]
+      : [['provas', 'Provas e resultados']];
     document.getElementById('navBarra').innerHTML = itens.map(function(i) {
       return '<button data-pg="' + i[0] + '" onclick="irPara(\'' + i[0] + '\')">' + i[1] + '</button>';
     }).join('');
   }
 
   function irPara(pg) {
-    ['pgCandidatos', 'pgProvas', 'pgProva'].forEach(function(p) { document.getElementById(p).classList.add('oculto'); });
+    ['pgCandidatos', 'pgProvas', 'pgProva', 'pgEquipe'].forEach(function(p) { document.getElementById(p).classList.add('oculto'); });
     document.querySelectorAll('#navBarra button').forEach(function(b) {
       b.classList.toggle('ativa', b.getAttribute('data-pg') === pg || (pg === 'prova' && b.getAttribute('data-pg') === 'provas'));
     });
     if (pg === 'candidatos') { document.getElementById('pgCandidatos').classList.remove('oculto'); carregarCandidatos(); }
     if (pg === 'provas') { document.getElementById('pgProvas').classList.remove('oculto'); carregarProvas(); }
     if (pg === 'prova') { document.getElementById('pgProva').classList.remove('oculto'); }
+    if (pg === 'equipe') { document.getElementById('pgEquipe').classList.remove('oculto'); carregarEquipe(); }
     window.scrollTo(0, 0);
+  }
+
+  // ───── EQUIPE (só master) ─────
+  var PAPEL_ROTULO = { master: 'Master · acesso total', secretaria: 'Secretaria · leitura' };
+
+  async function carregarEquipe() {
+    var r = await sb.rpc('equipe_gestao');
+    var linhas = r.data || [];
+    var membros = linhas.filter(function(x) { return x.papel; });
+    var pendentes = linhas.filter(function(x) { return !x.papel; });
+
+    var alvoP = document.getElementById('listaPendentes');
+    if (!pendentes.length) {
+      alvoP.innerHTML = '<p style="color:var(--cinza); padding:4px 0;">Nenhuma solicitação no momento. Quando alguém criar conta no /admin, aparece aqui pra você aprovar.</p>';
+    } else {
+      alvoP.innerHTML = pendentes.map(function(p) {
+        return '<div class="prova-card"><div><h3>' + esc(p.email) + '</h3>' +
+          '<div class="meta">conta criada em ' + new Date(p.criado_em).toLocaleString('pt-BR') + '</div></div>' +
+          '<div class="acoes-linha">' +
+          '<button class="btn" onclick="aprovar(\'' + p.user_id + '\', \'master\', \'' + esc(p.email) + '\')">Tornar Master</button>' +
+          '<button class="btn fantasma" onclick="aprovar(\'' + p.user_id + '\', \'secretaria\', \'' + esc(p.email) + '\')">Tornar Secretaria</button>' +
+          '</div></div>';
+      }).join('');
+    }
+
+    document.querySelector('#tabEquipe tbody').innerHTML = membros.map(function(m) {
+      var euMesmo = eu && m.user_id === euId;
+      var acoes = euMesmo
+        ? '<span class="badge laranja">Você</span>'
+        : (m.papel === 'master'
+            ? '<button class="btn fantasma" onclick="mudarPapel(\'' + m.user_id + '\', \'secretaria\', \'' + esc(m.email) + '\')">→ Secretaria</button> '
+            : '<button class="btn fantasma" onclick="mudarPapel(\'' + m.user_id + '\', \'master\', \'' + esc(m.email) + '\')">→ Master</button> ') +
+          '<button class="btn fantasma" style="border-color:rgba(229,72,77,0.5); color:#FFB3B6;" onclick="removerAcesso(\'' + m.user_id + '\', \'' + esc(m.email) + '\')">Remover</button>';
+      return '<tr><td><div class="principal">' + esc(m.nome || '—') + '</div></td>' +
+        '<td>' + esc(m.email) + '</td>' +
+        '<td><span class="badge ' + (m.papel === 'master' ? 'ok' : 'neutro') + '">' + (PAPEL_ROTULO[m.papel] || m.papel) + '</span></td>' +
+        '<td class="tabular">' + new Date(m.criado_em).toLocaleDateString('pt-BR') + '</td>' +
+        '<td><div class="acoes-linha">' + acoes + '</div></td></tr>';
+    }).join('') || '<tr><td colspan="5" style="text-align:center; color:var(--cinza); padding:20px;">Nenhum membro ainda.</td></tr>';
+  }
+
+  async function aprovar(userId, papel, email) {
+    var rotulo = papel === 'master' ? 'Master (acesso total)' : 'Secretaria (só leitura)';
+    var nome = prompt('Nome de ' + email + ' (aparece na lista da equipe):', '');
+    if (nome === null) return;
+    if (!confirm('Dar acesso ' + rotulo + ' para ' + email + '?')) return;
+    await aplicarPapel(userId, papel, nome);
+  }
+  async function mudarPapel(userId, papel, email) {
+    if (!confirm('Mudar ' + email + ' para ' + (papel === 'master' ? 'Master' : 'Secretaria') + '?')) return;
+    await aplicarPapel(userId, papel, null);
+  }
+  async function removerAcesso(userId, email) {
+    if (!confirm('Remover o acesso de ' + email + ' à gestão? (a conta continua existindo, mas sem permissão)')) return;
+    await aplicarPapel(userId, 'remover', null);
+  }
+  async function aplicarPapel(userId, papel, nome) {
+    var r = await sb.rpc('definir_papel', { p_user: userId, p_papel: papel, p_nome: nome });
+    if (r.error || (r.data && !r.data.ok)) {
+      alert((r.data && r.data.erro) || ('Não foi possível: ' + (r.error ? r.error.message : 'erro desconhecido')));
+    }
+    carregarEquipe();
   }
 
   // ───── CANDIDATOS ─────
