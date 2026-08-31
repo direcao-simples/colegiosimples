@@ -148,7 +148,7 @@
         </div>
       </div>
       <div class="cartao" style="padding:6px 4px;"><div class="rolagem-x"><table id="tabCand">
-        <thead><tr><th>Candidato</th><th>RA</th><th>Série</th><th>Escola atual</th><th>Responsável</th><th>Cadastro</th></tr></thead>
+        <thead><tr><th>Candidato</th><th>RA</th><th>Série</th><th>Escola atual</th><th>Responsável</th><th>Cadastro</th><th></th></tr></thead>
         <tbody></tbody></table></div></div>
     </div>
 
@@ -409,12 +409,28 @@
     });
     document.getElementById('candQtd').textContent = linhas.length + ' candidato' + (linhas.length === 1 ? '' : 's');
     document.querySelector('#tabCand tbody').innerHTML = linhas.map(function(c) {
+      var apagar = ehMaster()
+        ? '<button class="btn fantasma" style="padding:6px 10px; border-color:rgba(229,72,77,0.5); color:#FFB3B6;" title="Apagar candidato (cadastro, login e inscrições)" onclick="apagarCandidato(\'' + c.user_id + '\')">🗑</button>'
+        : '';
       return '<tr><td><div class="principal">' + esc(c.nome) + '</div><div class="apoio">' + esc(c.email || '') + '</div></td>' +
         '<td class="tabular">' + c.ra + '</td><td>' + (SERIES[c.serie] || c.serie).split(' — ')[0] + '</td>' +
         '<td>' + esc(c.escola_atual || '—') + '</td>' +
         '<td><div>' + esc(c.resp_nome || '—') + '</div><div class="apoio">' + esc(c.whatsapp || '') + '</div></td>' +
-        '<td class="tabular">' + new Date(c.criado_em).toLocaleDateString('pt-BR') + '</td></tr>';
-    }).join('') || '<tr><td colspan="6" style="text-align:center; color:var(--cinza); padding:26px;">Nenhum candidato ainda.</td></tr>';
+        '<td class="tabular">' + new Date(c.criado_em).toLocaleDateString('pt-BR') + '</td>' +
+        '<td>' + apagar + '</td></tr>';
+    }).join('') || '<tr><td colspan="7" style="text-align:center; color:var(--cinza); padding:26px;">Nenhum candidato ainda.</td></tr>';
+  }
+
+  async function apagarCandidato(userId) {
+    var c = candidatos.find(function(x) { return x.user_id === userId; });
+    if (!c) return;
+    if (!confirm('Apagar o candidato ' + c.nome + ' (RA ' + c.ra + ')?\n\nIsso remove o cadastro, o login da família e todas as inscrições dele em provas. Não tem volta.')) return;
+    var r = await sb.rpc('apagar_candidato', { p_user: userId });
+    if (r.error || (r.data && !r.data.ok)) {
+      alert((r.data && r.data.erro) || ('Não foi possível apagar: ' + (r.error ? r.error.message : 'erro desconhecido')));
+      return;
+    }
+    carregarCandidatos();
   }
 
   function csvCandidatos() {
@@ -489,7 +505,8 @@
     document.getElementById('chipLeitura').innerHTML = ehMaster() ? '' : '<span class="badge laranja">Somente leitura · Secretaria</span>';
     var acoes = document.getElementById('provaAcoes');
     acoes.innerHTML = ehMaster()
-      ? '<button class="btn fantasma" onclick="listaRAs()">🖨 Lista de RAs</button>' +
+      ? '<button class="btn fantasma" onclick="cartoesResposta()">🖨 Cartões-resposta</button>' +
+        '<button class="btn fantasma" onclick="listaRAs()">🖨 Lista de RAs</button>' +
         '<button class="btn fantasma" onclick="toggleImportar()">⬆ Importar notas</button>' +
         '<button class="btn fantasma" onclick="definirNotaMinima()">Nota mínima</button>' +
         '<button class="btn fantasma" onclick="aprovarTodos()">✓ Confirmar todas as inscrições</button>' +
@@ -739,6 +756,79 @@
     w.document.close();
     w.focus();
     setTimeout(function() { w.print(); }, 400);
+  }
+
+  // ───── CARTÕES-RESPOSTA PERSONALIZADOS (base do leitor de imagens) ─────
+  // Geometria padronizada para a correção automática por imagem:
+  // 4 marcadores pretos de 8mm nos cantos · QR de 22mm com o RA no topo direito ·
+  // grade de 45 questões em 3 colunas de 15, bolhas de 6mm com passo fixo.
+  function htmlCartoes() {
+    var ordenados = inscritos.slice().sort(function(a, b) {
+      return ((a.candidatos || {}).nome || '').localeCompare((b.candidatos || {}).nome || '', 'pt-BR');
+    });
+    var totalQ = provaAtual.total_questoes || 45;
+    var porColuna = Math.ceil(totalQ / 3);
+
+    var paginas = ordenados.map(function(m) {
+      var c = m.candidatos || {};
+      var colunas = '';
+      for (var col = 0; col < 3; col++) {
+        var linhas = '';
+        for (var q = col * porColuna + 1; q <= Math.min((col + 1) * porColuna, totalQ); q++) {
+          var bolhas = '';
+          'ABCDE'.split('').forEach(function(L) { bolhas += '<span class="bolha">' + L + '</span>'; });
+          linhas += '<div class="linha-q"><span class="num-q">' + (q < 10 ? '0' + q : q) + '</span>' + bolhas + '</div>';
+        }
+        colunas += '<div class="col-q">' + linhas + '</div>';
+      }
+      return '<div class="folha">' +
+        '<div class="fid tl"></div><div class="fid tr"></div><div class="fid bl"></div><div class="fid br"></div>' +
+        '<div class="cabeca">' +
+          '<div class="info">' +
+            '<div class="titulo-p">' + esc(provaAtual.titulo) + '</div>' +
+            '<div class="meta-p">' + fmtData(provaAtual.data_hora) + ' · Colégio Simples · Mossoró/RN</div>' +
+            '<div class="aluno-p"><strong>' + esc(c.nome || '') + '</strong> · RA <span class="ra-p">' + (c.ra || '') + '</span></div>' +
+          '</div>' +
+          '<img class="qr" data-ra="' + (c.ra || '') + '" alt="QR RA ' + (c.ra || '') + '">' +
+        '</div>' +
+        '<div class="instrucao">Preencha COMPLETAMENTE o círculo escolhido com caneta preta ou lápis escuro. Não rasure. Marque apenas UMA alternativa por questão.</div>' +
+        '<div class="grade">' + colunas + '</div>' +
+        '<div class="rodape-p">Acesso Simples · Colégio Simples — não dobre, não amasse e não escreva fora dos campos.</div>' +
+      '</div>';
+    }).join('');
+
+    return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Cartões-resposta — ' + esc(provaAtual.titulo) + '</title><style>' +
+      '@page{size:A4;margin:0;}*{box-sizing:border-box;margin:0;padding:0;}' +
+      'body{font-family:Arial,Helvetica,sans-serif;color:#000;background:#fff;}' +
+      '.folha{position:relative;width:210mm;height:296mm;padding:20mm 16mm 14mm;page-break-after:always;overflow:hidden;}' +
+      '.fid{position:absolute;width:8mm;height:8mm;background:#000;}' +
+      '.fid.tl{top:6mm;left:6mm;}.fid.tr{top:6mm;right:6mm;}.fid.bl{bottom:6mm;left:6mm;}.fid.br{bottom:6mm;right:6mm;}' +
+      '.cabeca{display:flex;justify-content:space-between;align-items:flex-start;gap:8mm;margin-bottom:5mm;}' +
+      '.titulo-p{font-size:14pt;font-weight:bold;}' +
+      '.meta-p{font-size:9pt;color:#333;margin-top:1mm;}' +
+      '.aluno-p{font-size:11pt;margin-top:4mm;}' +
+      '.ra-p{font-size:15pt;font-weight:bold;letter-spacing:1px;}' +
+      '.qr{width:22mm;height:22mm;}' +
+      '.instrucao{font-size:8.5pt;border:0.4mm solid #000;padding:2.5mm 3mm;margin-bottom:6mm;}' +
+      '.grade{display:flex;gap:8mm;}' +
+      '.col-q{flex:1;}' +
+      '.linha-q{display:flex;align-items:center;gap:2.4mm;height:11.5mm;}' +
+      '.num-q{width:8mm;font-size:9.5pt;font-weight:bold;text-align:right;margin-right:1mm;}' +
+      '.bolha{width:6mm;height:6mm;border:0.45mm solid #000;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:6.5pt;color:#555;}' +
+      '.rodape-p{position:absolute;bottom:8mm;left:20mm;right:20mm;text-align:center;font-size:7.5pt;color:#555;}' +
+      '</style></head><body>' + paginas +
+      '<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"><\/script>' +
+      '<script>window.addEventListener("load",function(){document.querySelectorAll("img.qr").forEach(function(im){var qr=qrcode(0,"H");qr.addData("RA:"+im.dataset.ra);qr.make();im.src=qr.createDataURL(6,8);});setTimeout(function(){window.print();},400);});<\/script>' +
+      '</body></html>';
+  }
+
+  function cartoesResposta() {
+    if (!inscritos.length) { alert('Nenhum inscrito nesta prova ainda.'); return; }
+    var w = window.open('', '_blank');
+    if (!w) { alert('O navegador bloqueou a janela — permita pop-ups para este site.'); return; }
+    w.document.write(htmlCartoes());
+    w.document.close();
+    w.focus();
   }
 
   // ───── utilidades ─────
