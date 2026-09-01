@@ -225,6 +225,8 @@
             <textarea id="mqContexto" rows="3" style="width:100%; background:#111; border:1px solid #333; border-radius:8px; color:var(--branco); font-size:13.5px; padding:10px 12px; outline:none;"></textarea></div>
           <div class="campo"><label>Fonte (opcional)</label>
             <input type="text" id="mqFonte" placeholder="ex.: ENEM 2023 (adaptada)"></div>
+          <div class="campo"><label>Imagem (opcional — URL pública do bucket "questoes" no Supabase)</label>
+            <input type="text" id="mqImagem" placeholder="https://nbawtjjbbcwfsilvwyuv.supabase.co/storage/v1/object/public/questoes/nivelamento-2027/q01.png"></div>
           <div class="campo"><label>Pergunta (comando da questão)</label>
             <textarea id="mqPergunta" rows="2" style="width:100%; background:#111; border:1px solid #333; border-radius:8px; color:var(--branco); font-size:13.5px; padding:10px 12px; outline:none;"></textarea></div>
           <div class="campo"><label>Alternativa A</label><input type="text" id="mqA"></div>
@@ -834,7 +836,7 @@
       '<thead><tr><th>Nº</th><th>Área</th><th>Questão (início)</th><th>Gab.</th><th></th></tr></thead><tbody>' +
       qs.map(function(q, i) {
         return '<tr><td class="tabular">' + q.n + '</td><td>' + esc(q.area || '—') + '</td>' +
-          '<td style="color:var(--cinza); font-size:12.5px;">' + esc((q.contexto || q.pergunta || '').slice(0, 70)) + '…</td>' +
+          '<td style="color:var(--cinza); font-size:12.5px;">' + (q.imagem ? '🖼 ' : '') + esc((q.contexto || q.pergunta || '').slice(0, 70)) + '…</td>' +
           '<td style="font-weight:700;">' + (q.gabarito || '<span style="color:var(--critico);">?</span>') + '</td>' +
           '<td style="white-space:nowrap; text-align:right;"><button class="btn fantasma" style="padding:4px 10px;" title="Editar" onclick="editarQuestao(' + i + ')">✏</button> ' +
           '<button class="btn fantasma" style="padding:4px 10px;" title="Excluir" onclick="excluirQuestao(' + i + ')">🗑</button></td></tr>';
@@ -843,7 +845,7 @@
 
   function limparFormQuestao() {
     mqEditando = null;
-    ['mqArea', 'mqContexto', 'mqFonte', 'mqPergunta', 'mqA', 'mqB', 'mqC', 'mqD', 'mqE', 'mqGab'].forEach(function(id) { document.getElementById(id).value = ''; });
+    ['mqArea', 'mqContexto', 'mqFonte', 'mqImagem', 'mqPergunta', 'mqA', 'mqB', 'mqC', 'mqD', 'mqE', 'mqGab'].forEach(function(id) { document.getElementById(id).value = ''; });
     document.getElementById('mqTitulo').textContent = '➕ Adicionar questão';
     document.getElementById('mqBtn').textContent = 'Adicionar à prova';
     document.getElementById('mqCancelar').classList.add('oculto');
@@ -856,6 +858,7 @@
     document.getElementById('mqArea').value = q.area || '';
     document.getElementById('mqContexto').value = q.contexto || '';
     document.getElementById('mqFonte').value = q.fonte || '';
+    document.getElementById('mqImagem').value = q.imagem || '';
     document.getElementById('mqPergunta').value = q.pergunta || '';
     'ABCDE'.split('').forEach(function(L) { document.getElementById('mq' + L).value = (q.alternativas && q.alternativas[L]) || ''; });
     document.getElementById('mqGab').value = q.gabarito || '';
@@ -886,6 +889,7 @@
       area: document.getElementById('mqArea').value.trim() || null,
       contexto: document.getElementById('mqContexto').value.trim(),
       fonte: document.getElementById('mqFonte').value.trim(),
+      imagem: document.getElementById('mqImagem').value.trim(),
       pergunta: document.getElementById('mqPergunta').value.trim(),
       alternativas: alts,
       gabarito: document.getElementById('mqGab').value || null
@@ -935,6 +939,7 @@
           area: o.area || null,
           contexto: String(o.contexto || ''),
           fonte: String(o.fonte || ''),
+          imagem: String(o.imagem || ''),
           pergunta: String(o.pergunta || o.enunciado || ''),
           alternativas: alts,
           gabarito: o.gabarito ? String(o.gabarito).trim().toUpperCase() : null
@@ -1066,10 +1071,11 @@
 
     function htmlQuestao(q) {
       var contexto = q.contexto ? '<p class="ctx">' + esc(q.contexto).replace(/\n/g, '<br>') + '</p>' : '';
+      var imagem = q.imagem ? '<img class="qimg" src="' + esc(q.imagem) + '" alt="">' : '';
       var fonte = q.fonte ? '<p class="fonte">' + esc(q.fonte) + '</p>' : '';
       var pergunta = esc(q.pergunta || q.enunciado || '').replace(/\n/g, '<br>');
       return '<div class="questao"><p class="qnum">QUESTÃO ' + (q.n < 10 ? '0' + q.n : q.n) + '</p>' +
-        contexto + fonte + '<p class="enun">' + pergunta + '</p>' +
+        contexto + imagem + fonte + '<p class="enun">' + pergunta + '</p>' +
         'ABCDE'.split('').map(function(L) {
           return '<div class="alt"><span class="lt">' + L + '</span><span class="tx">' + esc(q.alternativas[L] || '') + '</span></div>';
         }).join('') + '</div>';
@@ -1139,6 +1145,7 @@
       '.qnum{display:flex;align-items:center;gap:2.5mm;font-weight:800;font-size:10pt;margin-bottom:2mm;}' +
       '.qnum::after{content:"";flex:1;height:1.3mm;background:linear-gradient(to right,#d0d0d0,#000);}' +
       '.ctx{margin-bottom:1.5mm;text-align:justify;text-indent:4.5mm;}' +
+      '.qimg{display:block;max-width:100%;max-height:85mm;margin:1mm auto 1.5mm;}' +
       '.fonte{font-size:7.5pt;color:#222;text-align:right;margin-bottom:2mm;}' +
       '.enun{margin:1mm 0 2.2mm;text-align:justify;}' +
       '.alt{display:flex;gap:2mm;margin-bottom:1.4mm;}' +
@@ -1172,7 +1179,8 @@
       '</body></html>');
     w.document.close();
     w.focus();
-    setTimeout(function() { w.print(); }, 700);
+    var temImg = qs.some(function(q) { return q.imagem; });
+    setTimeout(function() { w.print(); }, temImg ? 2500 : 700);
   }
 
   function gabaritoOficial() {
