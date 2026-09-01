@@ -302,7 +302,12 @@
     var sess = (await sb.auth.getSession()).data.session;
     if (!sess) { mostrar('telaAuth'); return; }
     var q = await sb.from('equipe').select('*').eq('user_id', sess.user.id).maybeSingle();
-    if (!q.data) { mostrar('telaSemAcesso'); document.getElementById('quemNome').textContent = sess.user.email; document.getElementById('quemPapel').textContent = 'sem papel'; return; }
+    if (!q.data) {
+      // conta de candidato? mesmo login: leva direto pro portal da família
+      var cand = await sb.from('candidatos').select('user_id').eq('user_id', sess.user.id).maybeSingle();
+      if (cand.data) { window.location.href = 'https://www.colegiosimples.com/portal'; return; }
+      mostrar('telaSemAcesso'); document.getElementById('quemNome').textContent = sess.user.email; document.getElementById('quemPapel').textContent = 'sem papel'; return;
+    }
     eu = q.data;
     euId = sess.user.id;
     document.getElementById('quemNome').textContent = eu.nome;

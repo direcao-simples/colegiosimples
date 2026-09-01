@@ -379,7 +379,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     if (!sess) { mostrar('telaAuth'); return; }
     var c = await sb.from('candidatos').select('*').eq('user_id', sess.user.id).maybeSingle();
     if (c.error) { mostrar('telaAuth'); authErro('Erro ao carregar seus dados. Recarregue a página.'); return; }
-    if (!c.data) { mostrar('telaFicha'); return; }
+    if (!c.data) {
+      // conta da equipe? mesmo login: leva direto pra gestão
+      var eq = await sb.from('equipe').select('papel').eq('user_id', sess.user.id).maybeSingle();
+      if (eq.data) { window.location.href = 'https://www.colegiosimples.com/admin'; return; }
+      mostrar('telaFicha'); return;
+    }
     meuCandidato = c.data;
     document.getElementById('pNome').textContent = 'Olá, ' + meuCandidato.nome.split(' ')[0] + '!';
     document.getElementById('pSerie').textContent = 'Série em 2027 · ' + SERIES[meuCandidato.serie];
