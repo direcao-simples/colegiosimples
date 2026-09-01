@@ -213,8 +213,36 @@
       <!-- questões da prova (caderno padronizado + gabarito oficial) -->
       <div class="cartao oculto" id="cartaoQuestoes" style="border-color:rgba(255,90,0,0.5);">
         <div class="rotulo">Questões da prova</div>
+        <div id="qstLista" style="margin:0 0 16px;"></div>
+
+        <!-- editor manual: adicionar/editar questão sem arquivo -->
+        <div style="border:1px solid var(--borda); border-radius:10px; padding:14px 16px; margin-bottom:20px;">
+          <div style="font-weight:700; margin-bottom:12px;" id="mqTitulo">➕ Adicionar questão</div>
+          <div class="campo"><label>Área</label>
+            <input type="text" id="mqArea" list="mqAreas" placeholder="ex.: Linguagens, Matemática">
+            <datalist id="mqAreas"><option value="Linguagens"></option><option value="Matemática"></option><option value="Ciências da Natureza"></option><option value="Ciências Humanas"></option></datalist></div>
+          <div class="campo"><label>Contexto / texto de apoio (opcional)</label>
+            <textarea id="mqContexto" rows="3" style="width:100%; background:#111; border:1px solid #333; border-radius:8px; color:var(--branco); font-size:13.5px; padding:10px 12px; outline:none;"></textarea></div>
+          <div class="campo"><label>Fonte (opcional)</label>
+            <input type="text" id="mqFonte" placeholder="ex.: ENEM 2023 (adaptada)"></div>
+          <div class="campo"><label>Pergunta (comando da questão)</label>
+            <textarea id="mqPergunta" rows="2" style="width:100%; background:#111; border:1px solid #333; border-radius:8px; color:var(--branco); font-size:13.5px; padding:10px 12px; outline:none;"></textarea></div>
+          <div class="campo"><label>Alternativa A</label><input type="text" id="mqA"></div>
+          <div class="campo"><label>Alternativa B</label><input type="text" id="mqB"></div>
+          <div class="campo"><label>Alternativa C</label><input type="text" id="mqC"></div>
+          <div class="campo"><label>Alternativa D</label><input type="text" id="mqD"></div>
+          <div class="campo"><label>Alternativa E</label><input type="text" id="mqE"></div>
+          <div class="campo"><label>Gabarito</label>
+            <select id="mqGab"><option value="">— escolha —</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option></select></div>
+          <div class="acoes-linha">
+            <button class="btn" id="mqBtn" onclick="salvarQuestaoManual()">Adicionar à prova</button>
+            <button class="btn fantasma oculto" id="mqCancelar" onclick="limparFormQuestao()">Cancelar edição</button>
+          </div>
+          <div id="mqErro" class="erro-caixa oculto" style="margin-top:12px;"></div>
+        </div>
+
         <p style="color:var(--cinza); font-size:13.5px; margin:-4px 0 14px; line-height:1.7;">
-          Envie um <strong style="color:var(--branco);">arquivo JSON</strong> (formato padrão, igual ao contrato do Radix) ou cole no campo abaixo. A plataforma confere, salva na prova, exporta o <strong style="color:var(--branco);">caderno padronizado</strong> e usa o gabarito na correção automática.</p>
+          Ou importe várias de uma vez: envie um <strong style="color:var(--branco);">arquivo JSON</strong> (formato padrão, igual ao contrato do Radix) ou cole no campo abaixo. A plataforma confere, salva na prova, exporta o <strong style="color:var(--branco);">caderno padronizado</strong> e usa o gabarito na correção automática.</p>
         <pre style="background:#111; border:1px solid var(--borda); border-radius:8px; padding:12px 16px; font-size:12px; color:var(--cinza); line-height:1.7; overflow-x:auto; margin-bottom:14px;">[
   {
     "numero": 1,
@@ -487,7 +515,7 @@
       if (ehMaster()) {
         acoes += ' <button class="btn fantasma" onclick="alternarStatus(' + i + ')">' + (p.status === 'aberta' ? 'Encerrar' : 'Reabrir') + '</button>';
       }
-      return '<div class="prova-card"><div><h3>' + esc(p.titulo) + ' ' + badge + tipoBadge + '</h3>' +
+      return '<div class="prova-card"><div><h3><span onclick="abrirProva(' + i + ')" title="Abrir inscritos, resultados e questões" style="cursor:pointer;" onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">' + esc(p.titulo) + '</span> ' + badge + tipoBadge + '</h3>' +
         '<div class="meta">' + SERIES[p.serie] + ' · ' + fmtData(p.data_hora) + ' · inscrições até ' + fmtData(p.inscricoes_ate) +
         '<br><strong style="color:var(--branco);">' + qtd + '/' + p.capacidade + ' inscritos</strong>' +
         (p.nota_minima !== null ? ' · nota mínima ' + p.nota_minima + '/' + p.total_questoes : ' · sem nota mínima definida') +
@@ -558,6 +586,8 @@
     document.getElementById('cartaoQuestoes').classList.add('oculto');
     document.getElementById('qstPreview').innerHTML = '';
     document.getElementById('qstTexto').value = (provaAtual.questoes || []).length ? JSON.stringify(provaAtual.questoes, null, 2) : '';
+    desenharQuestoesSalvas();
+    limparFormQuestao();
     importPlano = null;
     questoesPlano = null;
     document.querySelector('#tabInsc tbody').innerHTML = '<tr><td colspan="8" class="carregando">Carregando…</td></tr>';
@@ -793,6 +823,99 @@
     return qs.map(function(q) { return q.gabarito; }).join('');
   }
 
+  // ── editor manual de questões (sem arquivo) ──
+  var mqEditando = null;
+
+  function desenharQuestoesSalvas() {
+    var alvo = document.getElementById('qstLista');
+    var qs = provaAtual && provaAtual.questoes || [];
+    if (!qs.length) { alvo.innerHTML = '<p style="color:var(--cinza); font-size:13px; margin:0;">Nenhuma questão salva nesta prova ainda — adicione abaixo ou importe em JSON.</p>'; return; }
+    alvo.innerHTML = '<div class="rolagem-x" style="max-height:280px; overflow-y:auto;"><table>' +
+      '<thead><tr><th>Nº</th><th>Área</th><th>Questão (início)</th><th>Gab.</th><th></th></tr></thead><tbody>' +
+      qs.map(function(q, i) {
+        return '<tr><td class="tabular">' + q.n + '</td><td>' + esc(q.area || '—') + '</td>' +
+          '<td style="color:var(--cinza); font-size:12.5px;">' + esc((q.contexto || q.pergunta || '').slice(0, 70)) + '…</td>' +
+          '<td style="font-weight:700;">' + (q.gabarito || '<span style="color:var(--critico);">?</span>') + '</td>' +
+          '<td style="white-space:nowrap; text-align:right;"><button class="btn fantasma" style="padding:4px 10px;" title="Editar" onclick="editarQuestao(' + i + ')">✏</button> ' +
+          '<button class="btn fantasma" style="padding:4px 10px;" title="Excluir" onclick="excluirQuestao(' + i + ')">🗑</button></td></tr>';
+      }).join('') + '</tbody></table></div>';
+  }
+
+  function limparFormQuestao() {
+    mqEditando = null;
+    ['mqArea', 'mqContexto', 'mqFonte', 'mqPergunta', 'mqA', 'mqB', 'mqC', 'mqD', 'mqE', 'mqGab'].forEach(function(id) { document.getElementById(id).value = ''; });
+    document.getElementById('mqTitulo').textContent = '➕ Adicionar questão';
+    document.getElementById('mqBtn').textContent = 'Adicionar à prova';
+    document.getElementById('mqCancelar').classList.add('oculto');
+    document.getElementById('mqErro').classList.add('oculto');
+  }
+
+  function editarQuestao(i) {
+    var q = provaAtual.questoes[i];
+    mqEditando = i;
+    document.getElementById('mqArea').value = q.area || '';
+    document.getElementById('mqContexto').value = q.contexto || '';
+    document.getElementById('mqFonte').value = q.fonte || '';
+    document.getElementById('mqPergunta').value = q.pergunta || '';
+    'ABCDE'.split('').forEach(function(L) { document.getElementById('mq' + L).value = (q.alternativas && q.alternativas[L]) || ''; });
+    document.getElementById('mqGab').value = q.gabarito || '';
+    document.getElementById('mqTitulo').textContent = '✏ Editando a questão ' + q.n;
+    document.getElementById('mqBtn').textContent = 'Salvar alterações';
+    document.getElementById('mqCancelar').classList.remove('oculto');
+    document.getElementById('mqErro').classList.add('oculto');
+    document.getElementById('mqTitulo').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  async function excluirQuestao(i) {
+    var q = provaAtual.questoes[i];
+    if (!confirm('Excluir a questão ' + q.n + '? As demais serão renumeradas.')) return;
+    var qs = provaAtual.questoes.slice();
+    qs.splice(i, 1);
+    qs.forEach(function(x, idx) { x.n = idx + 1; });
+    await persistirQuestoes(qs);
+    if (mqEditando !== null) limparFormQuestao();
+  }
+
+  async function salvarQuestaoManual() {
+    var erro = document.getElementById('mqErro');
+    erro.classList.add('oculto');
+    var alts = {};
+    'ABCDE'.split('').forEach(function(L) { alts[L] = document.getElementById('mq' + L).value.trim(); });
+    var q = {
+      n: 0,
+      area: document.getElementById('mqArea').value.trim() || null,
+      contexto: document.getElementById('mqContexto').value.trim(),
+      fonte: document.getElementById('mqFonte').value.trim(),
+      pergunta: document.getElementById('mqPergunta').value.trim(),
+      alternativas: alts,
+      gabarito: document.getElementById('mqGab').value || null
+    };
+    var faltas = [];
+    if (!q.pergunta) faltas.push('a pergunta');
+    var vazias = 'ABCDE'.split('').filter(function(L) { return !alts[L]; });
+    if (vazias.length) faltas.push('a(s) alternativa(s) ' + vazias.join(', '));
+    if (!q.gabarito) faltas.push('o gabarito');
+    if (faltas.length) { erro.textContent = 'Falta preencher ' + faltas.join(' e ') + '.'; erro.classList.remove('oculto'); return; }
+    var btn = document.getElementById('mqBtn');
+    btn.disabled = true;
+    var qs = (provaAtual.questoes || []).slice();
+    if (mqEditando !== null) qs[mqEditando] = q; else qs.push(q);
+    qs.forEach(function(x, idx) { x.n = idx + 1; });
+    var ok = await persistirQuestoes(qs);
+    btn.disabled = false;
+    if (ok) limparFormQuestao();
+  }
+
+  async function persistirQuestoes(qs) {
+    var r = await sb.from('provas').update({ questoes: qs }).eq('id', provaAtual.id);
+    if (r.error) { alert('Não foi possível salvar: ' + r.error.message); return false; }
+    provaAtual.questoes = qs;
+    document.getElementById('qstTexto').value = qs.length ? JSON.stringify(qs, null, 2) : '';
+    document.getElementById('impGabarito').value = gabaritoDasQuestoes() || '';
+    desenharQuestoesSalvas();
+    return true;
+  }
+
   // Entrada canônica: JSON (contrato tipo Radix). Texto simples segue aceito como alternativa.
   function parseEntradaQuestoes(texto) {
     var t = texto.trim();
@@ -921,6 +1044,7 @@
     document.getElementById('impGabarito').value = gabaritoDasQuestoes() || '';
     document.getElementById('qstPreview').innerHTML = '<div class="aviso-caixa"><strong>Questões salvas.</strong> O caderno e o gabarito já podem ser impressos, e a correção automática vai usar este gabarito.</div>';
     questoesPlano = null;
+    desenharQuestoesSalvas();
   }
 
   // Logomarca completa "Colégio Simples!" (Ativo 8, preta com ! vermelha) — usada nos impressos
