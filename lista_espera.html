@@ -232,11 +232,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <option value="">Selecione a série...</option>
           <option value="9ano" disabled>9º ano — Ensino Fundamental (vagas esgotadas)</option>
           <option value="1serie" disabled>1ª série — Ensino Médio (vagas esgotadas)</option>
-          <option value="2serie">2ª série — Ensino Médio</option>
+          <option value="2serie" disabled>2ª série — Ensino Médio (vagas esgotadas)</option>
           <option value="3serie">3ª série — Ensino Médio</option>
         </select>
         <div id="avisoEsgotado" style="display:none; margin-top:10px; background:rgba(255,90,0,0.08); border:1px solid rgba(255,90,0,0.5); border-radius:8px; padding:14px 16px; font-size:14px; color:#ccc; line-height:1.6;">
-          As vagas de <strong style="color:#fff;">9º ano</strong> e <strong style="color:#fff;">1ª série do Ensino Médio</strong> para 2027 estão esgotadas. Mas você pode entrar na fila de espera: se surgir vaga, chamamos as famílias na ordem de inscrição.<br>
+          <span id="avisoEsgotadoTexto">As vagas de <strong style="color:#fff;">9º ano</strong> e <strong style="color:#fff;">1ª série do Ensino Médio</strong> para 2027 estão esgotadas. Mas você pode entrar na fila de espera: se surgir vaga, chamamos as famílias na ordem de inscrição.</span><br>
           <a id="avisoEsgotadoLink" href="https://www.colegiosimples.com/fila_espera" style="display:inline-block; margin-top:10px; color:#FF5A00; font-weight:600; text-decoration:none; border:1px solid #FF5A00; border-radius:8px; padding:8px 18px;">Entrar na fila de espera →</a>
         </div>
       </div>
@@ -362,8 +362,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     });
   })();
 
-  // Séries com vagas esgotadas: bloqueadas na reserva; oferecem a fila de espera
-  var ESGOTADAS = ['9ano', '1serie'];
+  // Séries com vagas esgotadas: bloqueadas na reserva; 9º/1ª oferecem a fila, 2ª o WhatsApp
+  var ESGOTADAS = ['9ano', '1serie', '2serie'];
+
+  function mostrarAvisoEsgotado(serieKey) {
+    var link = document.getElementById('avisoEsgotadoLink');
+    if (serieKey === '2serie') {
+      document.getElementById('avisoEsgotadoTexto').innerHTML =
+        'As vagas de <strong style="color:#fff;">2ª série do Ensino Médio</strong> para 2027 estão esgotadas. Fale com a secretaria pelo WhatsApp para ser avisado caso surja alguma vaga.';
+      link.textContent = 'Falar pelo WhatsApp →';
+      link.href = 'https://wa.me/5584999161013';
+    } else if (serieKey) {
+      link.href = 'https://www.colegiosimples.com/fila_espera?serie=' + serieKey;
+    }
+    document.getElementById('avisoEsgotado').style.display = 'block';
+  }
 
   // Pré-seleção via URL: /lista_espera?serie=9ano | 1serie | 2serie | 3serie
   (function() {
@@ -371,10 +384,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     if (pre && SERIES[pre]) {
       document.addEventListener('DOMContentLoaded', function() {
         if (ESGOTADAS.indexOf(pre) !== -1) {
-          // Não pré-seleciona: mostra o aviso e leva pra fila com a série já marcada
-          document.getElementById('avisoEsgotado').style.display = 'block';
-          document.getElementById('avisoEsgotadoLink').href =
-            'https://www.colegiosimples.com/fila_espera?serie=' + pre;
+          // Não pré-seleciona: mostra o aviso com o caminho da série
+          mostrarAvisoEsgotado(pre);
         } else {
           document.getElementById('serie').value = pre;
         }
@@ -396,7 +407,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       return;
     }
     if (ESGOTADAS.indexOf(serieKey) !== -1) {
-      document.getElementById('avisoEsgotado').style.display = 'block';
+      mostrarAvisoEsgotado(serieKey);
       return;
     }
     if (!nomeAluno || !nascimento || !nomeResp || !whatsapp || !email) {
