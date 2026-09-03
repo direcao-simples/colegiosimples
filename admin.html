@@ -33,6 +33,22 @@
   .sair-btn { background: none; border: 1px solid var(--borda); border-radius: 8px; color: var(--cinza); font-family: inherit; font-size: 13px; padding: 8px 14px; cursor: pointer; }
   .sair-btn:hover { color: var(--branco); }
 
+  /* menu do usuário */
+  .menu-user { position: relative; }
+  .menu-drop { position: absolute; right: 0; top: calc(100% + 8px); background: var(--carvao); border: 1px solid var(--borda); border-radius: 10px; min-width: 190px; padding: 6px; z-index: 80; box-shadow: 0 12px 30px rgba(0,0,0,0.35); }
+  .menu-drop button { display: block; width: 100%; text-align: left; background: none; border: none; color: var(--branco); font-family: inherit; font-size: 13.5px; padding: 9px 12px; border-radius: 7px; cursor: pointer; }
+  .menu-drop button:hover { background: var(--laranja-suave); color: var(--laranja); }
+  .menu-drop .sep { height: 1px; background: var(--borda); margin: 5px 4px; }
+
+  /* tema claro */
+  body.tema-claro { --preto: #F2F0EC; --carvao: #FFFFFF; --carvao2: #ECE8E2; --borda: #DFD9D0; --branco: #161616; --cinza: #6B6863; --cinza2: #98938B; --laranja-suave: rgba(255,90,0,0.09); }
+  body.tema-claro input, body.tema-claro select, body.tema-claro textarea { background: #FBFAF8 !important; border-color: #D8D2C9 !important; color: #161616 !important; }
+  body.tema-claro pre { background: #F4F2EE !important; color: #555 !important; border-color: var(--borda) !important; }
+  body.tema-claro .campo select option { background: #fff; }
+  body.tema-claro .btn { color: #fff; }
+  body.tema-claro .menu-drop { box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+  body.tema-claro .logo-linha img { filter: brightness(0); }
+
   .nav { display: flex; gap: 6px; margin-bottom: 22px; flex-wrap: wrap; }
   .nav button { background: var(--carvao); border: 1px solid var(--borda); border-radius: 9px; color: var(--cinza); font-family: inherit; font-size: 14px; font-weight: 600; padding: 10px 18px; cursor: pointer; }
   .nav button.ativa { background: var(--laranja-suave); border-color: rgba(255,90,0,0.5); color: var(--laranja); }
@@ -107,7 +123,29 @@
     </div>
     <div class="quem-chip oculto" id="quemChip">
       <div class="nome"><span id="quemNome"></span><small id="quemPapel"></small></div>
-      <button class="sair-btn" onclick="sair()">Sair</button>
+      <div class="menu-user">
+        <button class="sair-btn" onclick="toggleMenuUser(event)">Menu ▾</button>
+        <div class="menu-drop oculto" id="menuUser">
+          <button onclick="abrirPerfil()">Editar perfil</button>
+          <button id="btnTema" onclick="alternarTema()">Modo claro</button>
+          <div class="sep"></div>
+          <button onclick="sair()">Sair</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- modal: editar perfil (equipe) -->
+  <div id="modalPerfil" class="oculto" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:90; display:flex; align-items:center; justify-content:center; padding:20px;">
+    <div class="cartao" style="max-width:420px; width:100%; margin:0;">
+      <div class="rotulo">Editar perfil</div>
+      <div class="campo"><label>Nome</label><input type="text" id="perfilNome"></div>
+      <p style="color:var(--cinza); font-size:12.5px; margin:-4px 0 14px;">O e-mail de acesso e o papel (master/secretaria) não mudam por aqui.</p>
+      <div class="acoes-linha">
+        <button class="btn" id="btnSalvarPerfil" onclick="salvarPerfil()">Salvar</button>
+        <button class="btn fantasma" onclick="fecharPerfil()">Cancelar</button>
+      </div>
+      <div id="perfilErro" class="erro-caixa oculto" style="margin-top:12px;"></div>
     </div>
   </div>
 
@@ -353,6 +391,48 @@
   }
 
   async function sair() { await sb.auth.signOut(); mostrar('telaAuth'); }
+
+  // ── menu do usuário: tema claro/escuro + perfil ──
+  function atualizarRotuloTema() {
+    var b = document.getElementById('btnTema');
+    if (b) b.textContent = document.body.classList.contains('tema-claro') ? 'Modo escuro' : 'Modo claro';
+  }
+  function alternarTema() {
+    document.body.classList.toggle('tema-claro');
+    try { localStorage.setItem('as-tema', document.body.classList.contains('tema-claro') ? 'claro' : 'escuro'); } catch (e) {}
+    atualizarRotuloTema();
+    fecharMenuUser();
+  }
+  function toggleMenuUser(e) { e.stopPropagation(); document.getElementById('menuUser').classList.toggle('oculto'); }
+  function fecharMenuUser() { document.getElementById('menuUser').classList.add('oculto'); }
+  document.addEventListener('click', function(ev) {
+    var m = document.getElementById('menuUser');
+    if (m && !m.classList.contains('oculto') && !ev.target.closest('.menu-user')) fecharMenuUser();
+  });
+  try { if (localStorage.getItem('as-tema') === 'claro') document.body.classList.add('tema-claro'); } catch (e) {}
+  atualizarRotuloTema();
+
+  function abrirPerfil() {
+    fecharMenuUser();
+    document.getElementById('perfilNome').value = (eu && eu.nome) || '';
+    document.getElementById('perfilErro').classList.add('oculto');
+    document.getElementById('modalPerfil').classList.remove('oculto');
+  }
+  function fecharPerfil() { document.getElementById('modalPerfil').classList.add('oculto'); }
+  async function salvarPerfil() {
+    var nome = document.getElementById('perfilNome').value.trim();
+    var e = document.getElementById('perfilErro');
+    e.classList.add('oculto');
+    if (!nome) { e.textContent = 'Informe o nome.'; e.classList.remove('oculto'); return; }
+    var btn = document.getElementById('btnSalvarPerfil');
+    btn.disabled = true;
+    var r = await sb.rpc('atualizar_meu_nome', { p_nome: nome });
+    btn.disabled = false;
+    if (r.error) { e.textContent = 'Não foi possível salvar: ' + r.error.message; e.classList.remove('oculto'); return; }
+    if (eu) eu.nome = nome;
+    document.getElementById('quemNome').textContent = nome;
+    fecharPerfil();
+  }
 
   async function iniciar() {
     mostrar('telaCarregando');
