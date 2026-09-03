@@ -51,6 +51,8 @@
   body.tema-claro .btn:disabled { color: var(--cinza2); }
   body.tema-claro .menu-drop { box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
   body.tema-claro .logo-linha img { filter: brightness(0); }
+  body.tema-claro .aviso-caixa { color: #6E4326; }
+  body.tema-claro .erro-caixa { color: #9E2227; }
 
   .nav { display: flex; gap: 6px; margin-bottom: 22px; flex-wrap: wrap; }
   .nav button { background: var(--carvao); border: 1px solid var(--borda); border-radius: 9px; color: var(--cinza); font-family: inherit; font-size: 14px; font-weight: 600; padding: 10px 18px; cursor: pointer; }
@@ -508,7 +510,7 @@
         : (m.papel === 'master'
             ? '<button class="btn fantasma" onclick="mudarPapel(\'' + m.user_id + '\', \'secretaria\', \'' + esc(m.email) + '\')">→ Secretaria</button> '
             : '<button class="btn fantasma" onclick="mudarPapel(\'' + m.user_id + '\', \'master\', \'' + esc(m.email) + '\')">→ Master</button> ') +
-          '<button class="btn fantasma" style="border-color:rgba(229,72,77,0.5); color:#FFB3B6;" onclick="removerAcesso(\'' + m.user_id + '\', \'' + esc(m.email) + '\')">Remover</button>';
+          '<button class="btn fantasma" style="border-color:rgba(229,72,77,0.5); color:var(--critico);" onclick="removerAcesso(\'' + m.user_id + '\', \'' + esc(m.email) + '\')">Remover</button>';
       return '<tr><td><div class="principal">' + esc(m.nome || '—') + '</div></td>' +
         '<td>' + esc(m.email) + '</td>' +
         '<td><span class="badge ' + (m.papel === 'master' ? 'ok' : 'neutro') + '">' + (PAPEL_ROTULO[m.papel] || m.papel) + '</span></td>' +
@@ -555,7 +557,7 @@
     document.getElementById('candQtd').textContent = linhas.length + ' candidato' + (linhas.length === 1 ? '' : 's');
     document.querySelector('#tabCand tbody').innerHTML = linhas.map(function(c) {
       var apagar = ehMaster()
-        ? '<button class="btn fantasma" style="padding:6px 10px; border-color:rgba(229,72,77,0.5); color:#FFB3B6;" title="Apagar candidato (cadastro, login e inscrições)" onclick="apagarCandidato(\'' + c.user_id + '\')">🗑</button>'
+        ? '<button class="btn fantasma" style="padding:6px 10px; border-color:rgba(229,72,77,0.5); color:var(--critico);" title="Apagar candidato (cadastro, login e inscrições)" onclick="apagarCandidato(\'' + c.user_id + '\')">🗑</button>'
         : '';
       return '<tr><td><div class="principal">' + esc(c.nome) + '</div><div class="apoio">' + esc(c.email || '') + '</div></td>' +
         '<td class="tabular">' + c.ra + '</td><td>' + (SERIES[c.serie] || c.serie).split(' — ')[0] + '</td>' +
@@ -1174,7 +1176,7 @@
     }).join('');
 
     var distribuicao = grupos.filter(function(g) { return g.area; }).map(function(g, i) {
-      return '<li class="dist">' + String.fromCharCode(97 + i) + ') questões de número ' + g.ini + ' a ' + g.fim + ', relativas à área de ' + esc(g.area) + ';</li>';
+      return '<div class="dist">' + String.fromCharCode(97 + i) + ') questões de número ' + g.ini + ' a ' + g.fim + ', relativas à área de ' + esc(g.area) + ';</div>';
     }).join('');
     var subProvas = grupos.filter(function(g) { return g.area; }).map(function(g) {
       return 'PROVA DE ' + esc(g.area).toUpperCase();
@@ -1190,32 +1192,32 @@
       '@page{size:A4;margin:16mm 15mm;}*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
       'body{font-family:"DM Sans",Arial,sans-serif;color:#000;font-size:9.5pt;line-height:1.42;}' +
       /* ── capa (modelo ENEM: cinza monocromático) ── */
-      '.capa{background:#d6d6d6;height:264mm;padding:8mm 9mm 6mm;display:flex;flex-direction:column;page-break-after:always;}' +
+      '.capa{background:#d6d6d6;height:auto;min-height:264mm;padding:7mm 9mm 5mm;display:flex;flex-direction:column;page-break-after:always;}' +
       '.capa>*{flex-shrink:0;}.capa>.bloco-inst{flex:1 1 auto;}' +
-      '.capa-topo{display:flex;justify-content:space-between;align-items:center;margin-bottom:4mm;}' +
-      '.capa-topo .cad{font-weight:800;font-size:11pt;letter-spacing:0.5px;}' +
-      '.capa-topo .serie{background:#111;color:#fff;font-weight:800;font-size:15pt;padding:2.5mm 8mm;}' +
-      '.regua{height:1.4mm;background:#111;margin-bottom:5mm;}' +
-      '.capa h1{font-weight:900;font-size:24.5pt;text-align:center;letter-spacing:0.3px;line-height:1.1;margin-bottom:2mm;}' +
-      '.capa .sub{text-align:center;font-weight:800;font-size:12pt;line-height:1.35;margin-bottom:6mm;}' +
-      '.cards{display:flex;gap:4mm;margin-bottom:6mm;}' +
-      '.card{background:#fff;padding:4mm 6mm;}' +
-      '.card-logo{flex:1;display:flex;align-items:center;justify-content:center;padding:6mm 8mm;}' +
-      '.card-logo img{height:17mm;display:block;margin:0 auto;}' +
-      '.card-nq{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:40mm;text-align:center;}' +
-      '.card-nq small{font-size:10pt;font-weight:700;letter-spacing:2px;}' +
-      '.card-nq b{font-size:23pt;line-height:1.1;}' +
-      '.card-nq span{font-size:9pt;font-weight:800;letter-spacing:1.5px;}' +
-      '.bloco-frase{background:#fff;border:0.6mm solid #111;padding:0 0 4mm;margin-bottom:5mm;}' +
-      '.bloco-frase .strip{background:#c9c9c9;color:#ececec;font-weight:900;font-size:16pt;letter-spacing:2px;padding:1.5mm 0 1.5mm 2mm;white-space:nowrap;overflow:hidden;margin:2.5mm 3mm 4mm;}' +
-      '.bloco-frase p{font-size:9.5pt;text-align:center;margin:0 8mm 3mm;}' +
-      '.bloco-frase .barra{background:#111;color:#fff;font-weight:800;text-align:center;padding:2.2mm;font-size:10.5pt;margin:0 8mm;}' +
-      '.bloco-inst{background:#fff;flex:1;padding:5mm 7mm;}' +
-      '.bloco-inst h3{text-align:center;font-size:10.5pt;font-weight:800;margin-bottom:3.5mm;}' +
-      '.bloco-inst ol{margin-left:5mm;font-size:9pt;line-height:1.5;}' +
-      '.bloco-inst li{margin-bottom:2mm;}.bloco-inst li::marker{font-weight:800;}' +
-      '.bloco-inst li.dist{list-style:none;text-align:left;font-weight:400;font-size:9pt;margin:0 0 1mm 4mm;}' +
-      '.capa-rodape{text-align:center;padding-top:4mm;}.capa-rodape img{height:8mm;}' +
+      '.capa-topo{display:flex;justify-content:space-between;align-items:center;margin-bottom:3mm;}' +
+      '.capa-topo .cad{font-weight:800;font-size:10.5pt;letter-spacing:0.5px;}' +
+      '.capa-topo .serie{background:#111;color:#fff;font-weight:800;font-size:13.5pt;padding:2mm 7mm;}' +
+      '.regua{height:1.3mm;background:#111;margin-bottom:4mm;}' +
+      '.capa h1{font-weight:900;font-size:22pt;text-align:center;letter-spacing:0.3px;line-height:1.1;margin-bottom:1.5mm;}' +
+      '.capa .sub{text-align:center;font-weight:800;font-size:10.5pt;line-height:1.3;margin-bottom:4mm;}' +
+      '.cards{display:flex;gap:4mm;margin-bottom:4mm;}' +
+      '.card{background:#fff;padding:3mm 6mm;}' +
+      '.card-logo{flex:1;display:flex;align-items:center;justify-content:center;padding:4mm 8mm;}' +
+      '.card-logo img{height:14mm;display:block;margin:0 auto;}' +
+      '.card-nq{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:38mm;text-align:center;}' +
+      '.card-nq small{font-size:9pt;font-weight:700;letter-spacing:2px;}' +
+      '.card-nq b{font-size:20pt;line-height:1.1;}' +
+      '.card-nq span{font-size:8.5pt;font-weight:800;letter-spacing:1.5px;}' +
+      '.bloco-frase{background:#fff;border:0.6mm solid #111;padding:0 0 3mm;margin-bottom:4mm;}' +
+      '.bloco-frase .strip{background:#c9c9c9;color:#ececec;font-weight:900;font-size:13.5pt;letter-spacing:2px;padding:1.2mm 0 1.2mm 2mm;white-space:nowrap;overflow:hidden;margin:2mm 3mm 3mm;}' +
+      '.bloco-frase p{font-size:9pt;text-align:center;margin:0 8mm 2.5mm;}' +
+      '.bloco-frase .barra{background:#111;color:#fff;font-weight:800;text-align:center;padding:2mm;font-size:10pt;margin:0 8mm;}' +
+      '.bloco-inst{background:#fff;flex:1;padding:4mm 7mm;}' +
+      '.bloco-inst h3{text-align:center;font-size:10pt;font-weight:800;margin-bottom:3mm;}' +
+      '.bloco-inst ol{margin-left:5mm;font-size:8.6pt;line-height:1.42;}' +
+      '.bloco-inst li{margin-bottom:1.6mm;}.bloco-inst li::marker{font-weight:800;}' +
+      '.bloco-inst .dist{margin:1mm 0 1mm 4mm;}' +
+      '.capa-rodape{text-align:center;padding-top:3mm;}.capa-rodape img{height:7mm;}' +
       /* ── miolo (2 colunas, divisória preta) ── */
       '.miolo{padding:0;}' +
       '.miolo-cab{display:flex;justify-content:center;align-items:center;border-bottom:0.3mm solid #999;padding-bottom:2.5mm;margin-bottom:5mm;}' +
@@ -1246,7 +1248,7 @@
       '<p><strong>ATENÇÃO</strong>: transcreva no espaço apropriado do seu CARTÃO-RESPOSTA, com sua caligrafia usual, considerando as letras maiúsculas e minúsculas, a seguinte frase:</p>' +
       '<div class="barra">A transformação é Simples</div></div>' +
       '<div class="bloco-inst"><h3>LEIA ATENTAMENTE AS INSTRUÇÕES SEGUINTES:</h3><ol>' +
-      '<li>Este CADERNO DE QUESTÕES contém ' + qs.length + ' questões numeradas de 1 a ' + qs.length + (distribuicao ? ', dispostas da seguinte maneira:' + '</li>' + distribuicao : '.</li>') +
+      '<li>Este CADERNO DE QUESTÕES contém ' + qs.length + ' questões numeradas de 1 a ' + qs.length + (distribuicao ? ', dispostas da seguinte maneira:' + distribuicao + '</li>' : '.</li>') +
       '<li>Confira se a quantidade e a ordem das questões do seu CADERNO DE QUESTÕES estão de acordo com as instruções anteriores. Caso o caderno esteja incompleto, tenha defeito ou apresente qualquer divergência, comunique ao aplicador da sala para que ele tome as providências cabíveis.</li>' +
       '<li>Para cada uma das questões objetivas, são apresentadas 5 opções. Apenas uma responde corretamente à questão.</li>' +
       '<li>O tempo disponível para esta prova é de <strong>três horas</strong>.</li>' +
